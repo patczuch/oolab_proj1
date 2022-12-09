@@ -7,15 +7,16 @@ import java.util.ArrayList;
 
 import java.lang.Thread;
 
-public class SimulationEngine implements IEngine, Runnable{
+public class SimulationEngine implements Runnable{
     private MoveDirection[] moves;
-    private final IWorldMap map;
+    private final AbstractWorldMap map;
     private final ArrayList<Animal> animals;
     public final int moveDelay;
     private final App app;
     private final Vector2d[] initialPositions;
+    private boolean stop = false;
 
-    public SimulationEngine(IWorldMap map, Vector2d[] initialPositions, App app, int moveDelay)
+    public SimulationEngine(AbstractWorldMap map, Vector2d[] initialPositions, App app, int moveDelay)
     {
         this.map = map;
         this.app = app;
@@ -23,7 +24,7 @@ public class SimulationEngine implements IEngine, Runnable{
         this.moveDelay = moveDelay;
         animals = new ArrayList<>();
     }
-    public SimulationEngine(MoveDirection[] moves, IWorldMap map, Vector2d[] initialPositions, App app, int moveDelay)
+    public SimulationEngine(MoveDirection[] moves, AbstractWorldMap map, Vector2d[] initialPositions, App app, int moveDelay)
     {
         this(map,initialPositions,app, moveDelay);
         this.moves = moves;
@@ -49,6 +50,8 @@ public class SimulationEngine implements IEngine, Runnable{
             if (i >= animals.size())
                 i = 0;
             update();
+            if (stop)
+                return;
         }
     }
 
@@ -59,7 +62,8 @@ public class SimulationEngine implements IEngine, Runnable{
         try {
             Thread.sleep(moveDelay);
         } catch (InterruptedException e) {
-            System.out.println("WARNING: Sleep interrupted");
+            System.out.println("Simulation interrupted");
+            stop = true;
         }
     }
 

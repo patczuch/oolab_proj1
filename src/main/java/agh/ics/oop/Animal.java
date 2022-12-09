@@ -6,35 +6,23 @@ import java.util.Objects;
 public class Animal implements IMapElement{
     private MapDirection orientation;
     private Vector2d position;
-    private final IWorldMap map;
-    private final ArrayList<IPositionChangeObserver> observers;
+    private final AbstractWorldMap map;
+    ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
 
-    public Animal(IWorldMap map)
+    public Animal(AbstractWorldMap map)
     {
         this(map,new Vector2d(0,0));
     }
 
-    public Animal(IWorldMap map, Vector2d initialPosition)
+    public Animal(AbstractWorldMap map, Vector2d initialPosition)
     {
         orientation = MapDirection.NORTH;
         position = initialPosition;
         this.map = map;
-        observers = new ArrayList<>();
         map.place(this);
     }
 
-    public String toString()
-    {
-        return switch (orientation)
-                {
-                    case EAST -> ">";
-                    case WEST -> "<";
-                    case NORTH -> "^";
-                    case SOUTH -> "v";
-                };
-    }
-
-    public boolean move(MoveDirection direction)
+    public void move(MoveDirection direction)
     {
         switch (direction)
         {
@@ -43,7 +31,7 @@ public class Animal implements IMapElement{
             case FORWARD -> {
                 Vector2d newPosition = position.add(orientation.toUnitVector());
                 if (!map.canMoveTo(newPosition))
-                    return false;
+                    return;
                 Vector2d oldPosition = position;
                 position = newPosition;
                 positionChanged(oldPosition);
@@ -51,20 +39,16 @@ public class Animal implements IMapElement{
             case BACKWARD -> {
                 Vector2d newPosition = position.subtract(orientation.toUnitVector());
                 if (!map.canMoveTo(newPosition))
-                    return false;
+                    return;
                 Vector2d oldPosition = position;
                 position = newPosition;
                 positionChanged(oldPosition);
             }
         }
-        return true;
     }
-
-
     public int hashCode() {
         return Objects.hash(orientation, position);
     }
-
     public boolean isFacing(MapDirection orientation)
     {
         return this.orientation.equals(orientation);
@@ -82,6 +66,10 @@ public class Animal implements IMapElement{
                     case WEST -> "left.png";
                     case NORTH -> "up.png";
                     case SOUTH -> "down.png";
+                    case NORTHEAST -> "up_right.png";
+                    case NORTHWEST -> "up_left.png";
+                    case SOUTHEAST -> "down_right.png";
+                    case SOUTHWEST -> "down_left.png";
                 };
     }
 
@@ -100,15 +88,13 @@ public class Animal implements IMapElement{
     {
         observers.add(observer);
     }
-
     public void removeObserver(IPositionChangeObserver observer)
     {
         observers.remove(observer);
     }
-
-    private void positionChanged (Vector2d oldPosition)
+    private void positionChanged(Vector2d oldPosition)
     {
         for (IPositionChangeObserver observer : observers)
-            observer.positionChanged(oldPosition, position);
+            observer.positionChanged(this, oldPosition);
     }
 }

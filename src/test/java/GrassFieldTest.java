@@ -6,7 +6,7 @@ public class GrassFieldTest {
     @Test
     public void fullTest()
     {
-        GrassField map =  new GrassField(10);
+        Earth map =  new Earth(10);
         Assertions.assertTrue(map.canMoveTo(new Vector2d(5,5)));
         Assertions.assertTrue(map.canMoveTo(new Vector2d(-1,-1)));
         Animal a = new Animal(map,new Vector2d(2,2));
