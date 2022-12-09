@@ -2,6 +2,7 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
+import javafx.stage.WindowEvent;
 
 public class App extends Application {
 
@@ -21,12 +23,11 @@ public class App extends Application {
     private ImageDictionary imageDictionary;
     private Thread simulationThread;
     private int cellSize = 30;
+    private Stage simulationStage;
     @Override
     public void start(Stage primaryStage) {
         gridPane = new GridPane();
         imageDictionary = new ImageDictionary();
-
-        gridPane.setGridLinesVisible(true);
 
         TextField movesInput = new TextField("f f f f f f f f f f f f f f f f f f f");
         Button startButton = new Button("Start");
@@ -35,18 +36,26 @@ public class App extends Application {
 
         VBox vbox = new VBox(movesInput, startButton);
 
-        BorderPane border = new BorderPane();
-        border.setTop(vbox);
-        border.setCenter(gridPane);
+        Scene scene = new Scene(vbox,600,600);
 
-        Scene scene = new Scene(border,600,600);
-
+        primaryStage.setTitle("Konfiguracja symulacji");
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        simulationStage = new Stage();
+        simulationStage.setTitle("Symulacja");
+        simulationStage.setScene(new Scene(gridPane, 450, 450));
+        simulationStage.setAlwaysOnTop(true);
+        simulationStage.setOnCloseRequest(e -> {
+            if (simulationThread != null)
+                simulationThread.interrupt();
+        });
     }
 
     private void start(String[] moves, int moveDelay)
     {
+        simulationStage.show();
+
         if (simulationThread != null)
             simulationThread.interrupt();
         map = new Earth(10,10, 20);
@@ -55,11 +64,6 @@ public class App extends Application {
         engine.changeMoves(OptionsParser.parse(moves));
         simulationThread = new Thread(engine);
         simulationThread.start();
-    }
-
-    @Override
-    public void stop(){
-        simulationThread.interrupt();
     }
 
     public void update()
