@@ -2,15 +2,19 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
 import javafx.stage.WindowEvent;
@@ -31,12 +35,11 @@ public class App extends Application {
 
         TextField movesInput = new TextField("f f f f f f f f f f f f f f f f f f f");
         Button startButton = new Button("Start");
-
         startButton.setOnAction(e -> start(movesInput.getText().split(" "), 100));
 
-        VBox vbox = new VBox(movesInput, startButton);
+        SimulationConfigInput simulationConfigInput = new SimulationConfigInput();
 
-        Scene scene = new Scene(vbox,600,600);
+        Scene scene = new Scene(new VBox(simulationConfigInput,startButton),600,600);
 
         primaryStage.setTitle("Konfiguracja symulacji");
         primaryStage.setScene(scene);
@@ -44,8 +47,11 @@ public class App extends Application {
 
         simulationStage = new Stage();
         simulationStage.setTitle("Symulacja");
-        simulationStage.setScene(new Scene(gridPane, 450, 450));
+        //Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+        //simulationStage.setScene(new Scene(gridPane, screenBounds.getWidth()*2/3, screenBounds.getHeight()*2/3));
+        simulationStage.setScene(new Scene(gridPane, 600, 600));
         simulationStage.setAlwaysOnTop(true);
+        simulationStage.setResizable(false);
         simulationStage.setOnCloseRequest(e -> {
             if (simulationThread != null)
                 simulationThread.interrupt();
@@ -72,7 +78,7 @@ public class App extends Application {
             for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
                 Vector2d objPos = new Vector2d(x + map.getLowerLeft().x, y + map.getLowerLeft().y);
                 Rectangle r = new Rectangle(cellSize,cellSize);
-                if (map.grassAt(objPos) != null)
+                if (map.plantAt(objPos) != null)
                     r.setFill(Color.GREEN);
                 else
                     r.setFill(Color.BEIGE);
