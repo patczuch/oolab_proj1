@@ -1,19 +1,24 @@
 package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+
+import java.util.Random;
 
 public class SimulationStage extends Stage {
     private final GridPane gridPane;
     public final int cellSize;
     ImageDictionary imageDictionary;
     AbstractWorldMap map;
-    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary)
+    Random random;
+    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, int seed)
     {
         super();
         this.gridPane = new GridPane();
@@ -21,12 +26,13 @@ public class SimulationStage extends Stage {
         this.imageDictionary = imageDictionary;
 
         MoveDirection[] moves = OptionsParser.parse("f f f f f f f f f f f f f f f f f f f".split(" "));
-        map = new Earth(10,10, 20);
+        map = new Earth(config.mapWidth,config.mapHeight,config.plantNumber);
         Vector2d[] initialPositions = {new Vector2d(2, 2), new Vector2d(3, 4)};
         SimulationEngine engine = new SimulationEngine(moves,map,initialPositions,250,this);
         Thread simulationThread = new Thread(engine);
         setTitle("Symulacja");
-        //Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+        random = new Random(seed);
+        Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         //simulationStage.setScene(new Scene(gridPane, screenBounds.getWidth()*2/3, screenBounds.getHeight()*2/3));
         setScene(new Scene(gridPane, 600, 600));
         setAlwaysOnTop(true);

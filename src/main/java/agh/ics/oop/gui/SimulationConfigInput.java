@@ -1,47 +1,68 @@
 package agh.ics.oop.gui;
 
+import agh.ics.oop.InputValuesConstraints;
+import agh.ics.oop.SimulationConfig;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
+import agh.ics.oop.SimulationTypes.*;
 public class SimulationConfigInput extends GridPane {
-
-    SimulationConfigInput()
+    NumberField mapHeightInput;
+    NumberField mapWidthInput;
+    ComboBox<MapType> mapTypeInput;
+    NumberField plantNumberInput;
+    NumberField plantEnergyInput;
+    NumberField plantGrowingNumberInput;
+    ComboBox<PlantGrowingType> plantGrowingType;
+    NumberField startAnimalNumberInput;
+    NumberField startAnimalEnergyInput;
+    NumberField fedAnimalEnergyInput;
+    NumberField breedingEnergyUsedAnimalInput;
+    NumberField minAnimalMutationsNumberInput;
+    NumberField maxAnimalMutationsNumberInput;
+    ComboBox<AnimalMutationType> animalMutationTypeInput;
+    NumberField animalGenesLength;
+    ComboBox<AnimalBehaviourType> animalBehaviourTypeInput;
+    SimulationConfigInput(SimulationConfig simulationConfig, InputValuesConstraints inputValuesConstraints)
     {
-        TextField mapHeightInput = new TextField();
-        TextField mapWidthInput = new TextField();
-        ComboBox mapTypeInput = new ComboBox(
+        mapHeightInput = new NumberField(simulationConfig.mapHeight,inputValuesConstraints.mapHeightInputConstraint);
+        mapWidthInput = new NumberField(simulationConfig.mapWidth,inputValuesConstraints.mapWidthInputConstraint);
+        mapTypeInput = new ComboBox<>(
                 FXCollections.observableArrayList(
-                        "Kula ziemska",
-                        "Piekielny portal"
+                        MapType.EARTH,
+                        MapType.HELLPORTAL
                 ));
-        TextField plantNumberInput = new TextField();
-        TextField plantEnergyInput = new TextField();
-        TextField plantGrowingNumberInput = new TextField();
-        ComboBox plantGrowingType = new ComboBox(
+        mapTypeInput.getSelectionModel().select(simulationConfig.mapType);
+        plantNumberInput = new NumberField(simulationConfig.plantNumber,inputValuesConstraints.plantNumberInputConstraint);
+        plantEnergyInput = new NumberField(simulationConfig.plantEnergy,inputValuesConstraints.plantEnergyInputConstraint);
+        plantGrowingNumberInput = new NumberField(simulationConfig.plantGrowingNumber,inputValuesConstraints.plantGrowingNumberInputConstraint);
+        plantGrowingType = new ComboBox<>(
                 FXCollections.observableArrayList(
-                        "Zalesione równiki",
-                        "Toksyczne trupy"
+                        PlantGrowingType.TOXICDEAD,
+                        PlantGrowingType.FORESTYEQUATORS
                 ));
-        TextField startAnimalNumberInput = new TextField();
-        TextField startAnimalEnergyInput = new TextField();
-        TextField fedAnimalEnergyInput = new TextField();
-        TextField breedingEnergyUsedAnimalInput = new TextField();
-        TextField minAnimalMutationsNumberInput = new TextField();
-        TextField maxAnimalMutationsNumberInput = new TextField();
-        ComboBox animalMutationTypeInput = new ComboBox(
+        plantGrowingType.getSelectionModel().select(simulationConfig.plantGrowingType);
+        startAnimalNumberInput = new NumberField(simulationConfig.startAnimalNumber,inputValuesConstraints.startAnimalNumberInputConstraint);
+        startAnimalEnergyInput = new NumberField(simulationConfig.startAnimalEnergy,inputValuesConstraints.startAnimalEnergyInputConstraint);
+        fedAnimalEnergyInput = new NumberField(simulationConfig.fedAnimalEnergy,inputValuesConstraints.fedAnimalEnergyInputConstraint);
+        breedingEnergyUsedAnimalInput = new NumberField(simulationConfig.breedingEnergyUsedAnimal,inputValuesConstraints.breedingEnergyUsedAnimalInputConstraint);
+        minAnimalMutationsNumberInput = new NumberField(simulationConfig.minAnimalMutationsNumber,inputValuesConstraints.minAnimalMutationsNumberInputConstraint);
+        maxAnimalMutationsNumberInput = new NumberField(simulationConfig.maxAnimalMutationsNumber,inputValuesConstraints.maxAnimalMutationsNumberInputConstraint);
+        animalMutationTypeInput = new ComboBox<>(
                 FXCollections.observableArrayList(
-                        "Pełna losowość",
-                        "Lekka korekta"
+                        AnimalMutationType.FULLYRANDOM,
+                        AnimalMutationType.LESSRANDOM
                 ));
-        TextField animalGenesLength = new TextField();
-        ComboBox animalBehaviourTypeInput = new ComboBox(
+        animalMutationTypeInput.getSelectionModel().select(simulationConfig.animalMutationType);
+        animalGenesLength = new NumberField(simulationConfig.animalGenesLength,inputValuesConstraints.animalGenesLengthConstraint);
+        animalBehaviourTypeInput = new ComboBox<>(
                 FXCollections.observableArrayList(
-                        "Pełna predestynacja",
-                        "Nieco szaleństwa"
+                        AnimalBehaviourType.FULLYDETERMINED,
+                        AnimalBehaviourType.SLIGHTLYCRAZY
                 ));
+        animalBehaviourTypeInput.getSelectionModel().select(simulationConfig.animalBehaviourType);
         this.add(new Label("Wysokość mapy:"),0,0);
         this.add(mapHeightInput,1,0);
         this.add(new Label("Szerokość mapy:"),0,1);
@@ -74,5 +95,14 @@ public class SimulationConfigInput extends GridPane {
         this.add(animalGenesLength,1,14);
         this.add(new Label("Wariant zachowania zwierząt:"),0,15);
         this.add(animalBehaviourTypeInput,1,15);
+    }
+
+    public SimulationConfig getSimulationConfig()
+    {
+        return new SimulationConfig(mapHeightInput.getValue(),mapWidthInput.getValue(),mapTypeInput.getValue(),plantNumberInput.getValue(),
+                plantEnergyInput.getValue(),plantGrowingNumberInput.getValue(),plantGrowingType.getValue(),startAnimalNumberInput.getValue(),
+                startAnimalEnergyInput.getValue(),fedAnimalEnergyInput.getValue(),breedingEnergyUsedAnimalInput.getValue(),
+                minAnimalMutationsNumberInput.getValue(), maxAnimalMutationsNumberInput.getValue(),
+                animalMutationTypeInput.getValue(), animalGenesLength.getValue(), animalBehaviourTypeInput.getValue());
     }
 }
