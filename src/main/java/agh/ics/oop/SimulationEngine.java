@@ -1,7 +1,12 @@
 package agh.ics.oop;
 
 import agh.ics.oop.gui.App;
+import agh.ics.oop.gui.SimulationStage;
 import javafx.application.Platform;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 
@@ -12,33 +17,21 @@ public class SimulationEngine implements Runnable{
     private final AbstractWorldMap map;
     private final ArrayList<Animal> animals;
     public final int moveDelay;
-    private final App app;
-    private final Vector2d[] initialPositions;
+    private final SimulationStage stage;
     private boolean stop = false;
-
-    public SimulationEngine(AbstractWorldMap map, Vector2d[] initialPositions, App app, int moveDelay)
+    public SimulationEngine(MoveDirection[] moves, AbstractWorldMap map, Vector2d[] initialPositions, int moveDelay, SimulationStage stage)
     {
         this.map = map;
-        this.app = app;
-        this.initialPositions = initialPositions;
+        this.stage = stage;
         this.moveDelay = moveDelay;
-        animals = new ArrayList<>();
-    }
-    public SimulationEngine(MoveDirection[] moves, AbstractWorldMap map, Vector2d[] initialPositions, App app, int moveDelay)
-    {
-        this(map,initialPositions,app, moveDelay);
         this.moves = moves;
-        setInitialPositions();
-    }
-
-    private void setInitialPositions()
-    {
-        animals.clear();
+        animals = new ArrayList<>();
         for (Vector2d pos : initialPositions) {
             Animal a = new Animal(map, pos);
             animals.add(a);
         }
     }
+
     @Override
     public void run() {
         update();
@@ -57,7 +50,7 @@ public class SimulationEngine implements Runnable{
 
     private void update()
     {
-        Platform.runLater(app::update);
+        Platform.runLater(stage::update);
         //System.out.println(map);
         try {
             Thread.sleep(moveDelay);
@@ -66,11 +59,4 @@ public class SimulationEngine implements Runnable{
             stop = true;
         }
     }
-
-    public void changeMoves(MoveDirection[] moves)
-    {
-        setInitialPositions();
-        this.moves = moves;
-    }
-
 }
