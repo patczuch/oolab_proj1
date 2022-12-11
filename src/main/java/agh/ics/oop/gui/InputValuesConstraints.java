@@ -1,4 +1,6 @@
-package agh.ics.oop;
+package agh.ics.oop.gui;
+
+import agh.ics.oop.NumberConstraint;
 
 public class InputValuesConstraints {
     public final NumberConstraint mapHeightInputConstraint;

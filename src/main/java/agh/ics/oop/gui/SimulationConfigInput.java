@@ -1,6 +1,5 @@
 package agh.ics.oop.gui;
 
-import agh.ics.oop.InputValuesConstraints;
 import agh.ics.oop.SimulationConfig;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
