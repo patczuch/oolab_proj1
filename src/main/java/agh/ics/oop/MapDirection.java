@@ -1,5 +1,7 @@
 package agh.ics.oop;
 
+import java.util.Random;
+
 public enum MapDirection {
     NORTH("Północ", new Vector2d(0,1)),
     SOUTH("Południe", new Vector2d(0,-1)),
@@ -51,6 +53,11 @@ public enum MapDirection {
                     case NORTHEAST -> NORTH;
                     case EAST -> NORTHEAST;
                 };
+    }
+
+    public static MapDirection getRandom(Random rand)
+    {
+        return MapDirection.values()[rand.nextInt()&Integer.MAX_VALUE%MapDirection.values().length];
     }
 
     public Vector2d toUnitVector()

@@ -25,8 +25,10 @@ public class NumberField extends TextField {
             throw new RuntimeException("Starting value of number field doesn't fit in the constraints!");
         defaultValue = startingValue;
         textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("-?\\d*"))
-                setText(newValue.replaceAll("[^-?\\d]", ""));
+            if (!newValue.matches("^-?\\d*$"))
+                setText(newValue.replaceAll("[^-\\d]", ""));
+            if (newValue.length() > 0 && newValue.charAt(0) == '-')
+                setText('-'+newValue.replaceAll("[^\\d]", ""));
             if (getText().length() > 0 && !getText().equals("-"))
                 if (new BigInteger(getText()).compareTo(new BigInteger(Integer.toString(Integer.MAX_VALUE))) > 0)
                     setText(Integer.toString(Integer.MAX_VALUE));

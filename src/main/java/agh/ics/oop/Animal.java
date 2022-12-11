@@ -2,50 +2,51 @@ package agh.ics.oop;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Random;
 
 public class Animal implements IMapElement{
     private MapDirection orientation;
     private Vector2d position;
     private final AbstractWorldMap map;
-    ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
-
-    public Animal(AbstractWorldMap map)
+    public ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
+    private final MoveDirection[] moves;
+    private final Random rand;
+    private int currMove;
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, int genesLength)
     {
-        this(map,new Vector2d(0,0));
+        this(map,initialPosition,MoveDirection.randomMoves(rand,genesLength),MapDirection.getRandom(rand),rand);
     }
-
-    public Animal(AbstractWorldMap map, Vector2d initialPosition)
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, MapDirection initialOrientation, Random rand)
     {
-        orientation = MapDirection.NORTH;
-        position = initialPosition;
+        this.position = initialPosition;
         this.map = map;
-        map.place(this);
+        this.moves = moves;
+        this.orientation = initialOrientation;
+        this.rand = rand;
+        currMove = 0;
+        map.placeAnimal(this);
     }
 
-    public void move(MoveDirection direction)
+    private void moveInDir(MoveDirection direction)
     {
-        switch (direction)
-        {
-            case RIGHT -> orientation = orientation.next();
-            case LEFT -> orientation = orientation.previous();
-            case FORWARD -> {
-                Vector2d newPosition = position.add(orientation.toUnitVector());
-                if (!map.canMoveTo(newPosition))
-                    return;
-                Vector2d oldPosition = position;
-                position = newPosition;
-                positionChanged(oldPosition);
-            }
-            case BACKWARD -> {
-                Vector2d newPosition = position.subtract(orientation.toUnitVector());
-                if (!map.canMoveTo(newPosition))
-                    return;
-                Vector2d oldPosition = position;
-                position = newPosition;
-                positionChanged(oldPosition);
-            }
-        }
+        for (int i = 0; i<direction.numberOfTurns; i++)
+            orientation = orientation.next();
+        Vector2d newPosition = position.add(orientation.toUnitVector());
+        if (!map.canMoveTo(newPosition))
+            return;
+        Vector2d oldPosition = position;
+        position = newPosition;
+        positionChanged(oldPosition);
     }
+
+    public void move()
+    {
+        moveInDir(moves[currMove]);
+        currMove++;
+        if (currMove >= moves.length)
+            currMove = 0;
+    }
+
     public int hashCode() {
         return Objects.hash(orientation, position);
     }

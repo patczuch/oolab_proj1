@@ -22,31 +22,25 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
         return position.follows(getLowerLeft()) && position.precedes(getUpperRight());
     }
 
-    public void place(Animal a) {
+    public void placeAnimal(Animal a) {
         if (!animals.containsKey(a.getPosition()))
             animals.put(a.getPosition(), new ArrayList<>());
         animals.get(a.getPosition()).add(a);
         a.addObserver(this);
     }
 
+    public void placePlant(Plant p) {
+        plants.put(p.getPosition(),p);
+    }
+
     public void positionChanged(Animal a, Vector2d oldPosition)
     {
         animals.get(oldPosition).remove(a);
         a.removeObserver(this);
-        place(a);
+        placeAnimal(a);
     }
 
-    public Plant createRandomPlant()
-    {
-        Vector2d newPosition = randomPosition();
-        while (isPlantAt(newPosition))
-            newPosition = randomPosition();
-        Plant newPlant = new Plant(newPosition);
-        plants.put(newPosition,newPlant);
-        return newPlant;
-    }
-
-    private Vector2d randomPosition()
+    public Vector2d randomPosition()
     {
         return new Vector2d(rand.nextInt(getUpperRight().x),rand.nextInt(getUpperRight().y));
     }
