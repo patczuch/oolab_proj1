@@ -13,17 +13,8 @@ public class Plant implements IMapElement{
         return position;
     }
 
-    public String toString() {
-        return "*";
-    }
-
     @Override
     public String getTexturePath() {
         return "grass.png";
-    }
-    @Override
-    public String getLabel()
-    {
-        return "Trawa";
     }
 }

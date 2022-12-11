@@ -23,8 +23,9 @@ public class SimulationConfigInput extends GridPane {
     NumberField minAnimalMutationsNumberInput;
     NumberField maxAnimalMutationsNumberInput;
     ComboBox<AnimalMutationType> animalMutationTypeInput;
-    NumberField animalGenesLength;
+    NumberField animalGenesLengthInput;
     ComboBox<AnimalBehaviourType> animalBehaviourTypeInput;
+    NumberField moveDelayInput;
     SimulationConfigInput(SimulationConfig simulationConfig, InputValuesConstraints inputValuesConstraints)
     {
         mapHeightInput = new NumberField(simulationConfig.mapHeight,inputValuesConstraints.mapHeightInputConstraint);
@@ -56,13 +57,14 @@ public class SimulationConfigInput extends GridPane {
                         AnimalMutationType.LESSRANDOM
                 ));
         animalMutationTypeInput.getSelectionModel().select(simulationConfig.animalMutationType);
-        animalGenesLength = new NumberField(simulationConfig.animalGenesLength,inputValuesConstraints.animalGenesLengthConstraint);
+        animalGenesLengthInput = new NumberField(simulationConfig.animalGenesLength,inputValuesConstraints.animalGenesLengthConstraint);
         animalBehaviourTypeInput = new ComboBox<>(
                 FXCollections.observableArrayList(
                         AnimalBehaviourType.FULLYDETERMINED,
                         AnimalBehaviourType.SLIGHTLYCRAZY
                 ));
         animalBehaviourTypeInput.getSelectionModel().select(simulationConfig.animalBehaviourType);
+        moveDelayInput = new NumberField(simulationConfig.moveDelay,inputValuesConstraints.moveDelayConstraint);
         this.add(new Label("Wysokość mapy:"),0,0);
         this.add(mapHeightInput,1,0);
         this.add(new Label("Szerokość mapy:"),0,1);
@@ -92,9 +94,11 @@ public class SimulationConfigInput extends GridPane {
         this.add(new Label("Wariant mutacji:"),0,13);
         this.add(animalMutationTypeInput,1,13);
         this.add(new Label("Długość genomu zwierząt:"),0,14);
-        this.add(animalGenesLength,1,14);
+        this.add(animalGenesLengthInput,1,14);
         this.add(new Label("Wariant zachowania zwierząt:"),0,15);
         this.add(animalBehaviourTypeInput,1,15);
+        this.add(new Label("Opóźnienie pomiędzy ruchami:"),0,16);
+        this.add(moveDelayInput,1,16);
     }
 
     public SimulationConfig getSimulationConfig()
@@ -103,6 +107,6 @@ public class SimulationConfigInput extends GridPane {
                 plantEnergyInput.getValue(),plantGrowingNumberInput.getValue(),plantGrowingType.getValue(),startAnimalNumberInput.getValue(),
                 startAnimalEnergyInput.getValue(),fedAnimalEnergyInput.getValue(),breedingEnergyUsedAnimalInput.getValue(),
                 minAnimalMutationsNumberInput.getValue(), maxAnimalMutationsNumberInput.getValue(),
-                animalMutationTypeInput.getValue(), animalGenesLength.getValue(), animalBehaviourTypeInput.getValue());
+                animalMutationTypeInput.getValue(), animalGenesLengthInput.getValue(), animalBehaviourTypeInput.getValue(), moveDelayInput.getValue());
     }
 }

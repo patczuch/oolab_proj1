@@ -5,14 +5,14 @@ import java.util.Random;
 
 public class Earth extends AbstractWorldMap{
 
-    public Earth(int width, int height, int plantAmount)
+    public Earth(int width, int height)
     {
-        this(width, height, plantAmount, new Random());
+        this(width, height, new Random());
     }
 
-    public Earth(int width, int height, int plantAmount, Random rand)
+    public Earth(int width, int height, Random rand)
     {
-        super(width,height,plantAmount,rand);
+        super(width,height,rand);
 
     }
 }

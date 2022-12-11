@@ -72,18 +72,10 @@ public class Animal implements IMapElement{
                     case SOUTHWEST -> "down_left.png";
                 };
     }
-
-    @Override
-    public String getLabel()
-    {
-        return getPosition().toString();
-    }
-
     public Vector2d getPosition()
     {
         return position;
     }
-
     public void addObserver(IPositionChangeObserver observer)
     {
         observers.add(observer);

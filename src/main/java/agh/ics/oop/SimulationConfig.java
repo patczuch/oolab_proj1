@@ -19,9 +19,10 @@ public class SimulationConfig {
     public final AnimalMutationType animalMutationType;
     public final int animalGenesLength;
     public final AnimalBehaviourType animalBehaviourType;
+    public final int moveDelay;
     public SimulationConfig(int mapHeight, int mapWidth, MapType mapType, int plantNumber, int plantEnergy, int plantGrowingNumber, PlantGrowingType plantGrowingType,
                              int startAnimalNumber, int startAnimalEnergy, int fedAnimalEnergy, int breedingEnergyUsedAnimal, int minAnimalMutationsNumber,
-                             int maxAnimalMutationsNumber, AnimalMutationType animalMutationType, int animalGenesLength, AnimalBehaviourType animalBehaviourType)
+                             int maxAnimalMutationsNumber, AnimalMutationType animalMutationType, int animalGenesLength, AnimalBehaviourType animalBehaviourType, int moveDelay)
     {
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
@@ -39,5 +40,6 @@ public class SimulationConfig {
         this.animalMutationType = animalMutationType;
         this.animalGenesLength = animalGenesLength;
         this.animalBehaviourType = animalBehaviourType;
+        this.moveDelay = moveDelay;
     }
 }

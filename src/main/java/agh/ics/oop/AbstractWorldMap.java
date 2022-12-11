@@ -10,15 +10,12 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
     private final HashMap<Vector2d, ArrayList<Animal>> animals;
     private final HashMap<Vector2d, Plant> plants;
     Random rand;
-    protected AbstractWorldMap(int width, int height, int grassAmount, Random rand) {
+    protected AbstractWorldMap(int width, int height, Random rand) {
         animals = new HashMap<>();
         plants = new HashMap<>();
         lowerLeft = new Vector2d(0,0);
         upperRight = new Vector2d(width-1,height-1);
         this.rand = rand;
-
-        for (int i = 0; i<grassAmount; i++)
-            createRandomGrass();
     }
 
     public boolean canMoveTo(Vector2d position) {
@@ -39,13 +36,14 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
         place(a);
     }
 
-    private void createRandomGrass()
+    public Plant createRandomPlant()
     {
         Vector2d newPosition = randomPosition();
         while (isPlantAt(newPosition))
             newPosition = randomPosition();
         Plant newPlant = new Plant(newPosition);
         plants.put(newPosition,newPlant);
+        return newPlant;
     }
 
     private Vector2d randomPosition()
