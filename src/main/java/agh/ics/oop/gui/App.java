@@ -53,6 +53,5 @@ public class App extends Application {
         primaryStage.setTitle("Konfiguracja symulacji");
         primaryStage.setScene(scene);
         primaryStage.show();
-        int a;
     }
 }
