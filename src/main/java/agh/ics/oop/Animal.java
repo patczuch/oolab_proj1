@@ -29,8 +29,7 @@ public class Animal implements IMapElement{
 
     private void moveInDir(MoveDirection direction)
     {
-        for (int i = 0; i<direction.numberOfTurns; i++)
-            orientation = orientation.next();
+        orientation = orientation.rotate(direction);
         Vector2d newPosition = position.add(orientation.toUnitVector());
         if (!map.canMoveTo(newPosition))
             return;
