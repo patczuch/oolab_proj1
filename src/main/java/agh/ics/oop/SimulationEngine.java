@@ -3,11 +3,8 @@ package agh.ics.oop;
 import agh.ics.oop.gui.App;
 import agh.ics.oop.gui.SimulationStage;
 import javafx.application.Platform;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import java.lang.Thread;
@@ -26,7 +23,12 @@ public class SimulationEngine implements Runnable{
     public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
     {
         this.config = config;
-        this.map = new Earth(config.mapWidth,config.mapHeight,rand);
+        switch(config.mapType)
+        {
+            case EARTH -> this.map = new Earth(config,rand);
+            case HELLPORTAL -> this.map = new HellPortal(config,rand);
+            default -> this.map = new Earth(config,rand);
+        }
         this.stage = stage;
         this.rand = rand;
 
@@ -55,7 +57,7 @@ public class SimulationEngine implements Runnable{
     }
 
     private Animal createRandomAnimal() {
-        return new Animal(map, map.randomPosition(),rand,config.animalGenesLength);
+        return new Animal(map, map.randomPosition(),rand,config.animalGenesLength,config.startAnimalEnergy);
     }
 
     @Override
