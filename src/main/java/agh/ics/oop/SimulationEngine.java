@@ -49,6 +49,12 @@ public class SimulationEngine implements Runnable{
     private Plant createRandomPlant()
     {
         Vector2d newPosition = map.randomPosition();
+
+        if (this.config.plantGrowingType == SimulationTypes.PlantGrowingType.FORESTYEQUATORS) {
+            boolean preferable = Math.random() <= 0.8;
+            while (map.isPlantAt(newPosition) || map.isPreferableForPlants(newPosition) != preferable)
+                newPosition = map.randomPosition();
+        }
         while (map.isPlantAt(newPosition))
             newPosition = map.randomPosition();
         return new Plant(map,newPosition);

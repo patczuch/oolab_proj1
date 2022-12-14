@@ -15,4 +15,10 @@ public class Earth extends AbstractWorldMap{
         super(width,height,rand);
 
     }
+
+    @Override
+    public boolean isPreferableForPlants(Vector2d position) {
+        int height = (this.getUpperRight().subtract(this.getLowerLeft())).y + 1;
+        return Math.abs(height / 2 - position.y) <= 0.1 * height;
+    }
 }

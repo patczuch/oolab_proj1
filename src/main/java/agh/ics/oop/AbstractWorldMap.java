@@ -62,4 +62,8 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
     public Vector2d getUpperRight() {
         return upperRight;
     }
+
+    public boolean isPreferableForPlants(Vector2d position) {
+        return false;
+    }
 }
