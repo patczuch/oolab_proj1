@@ -31,24 +31,20 @@ public class Animal implements IMapElement{
 
     public void rotate(MoveDirection direction)
     {
-        for (int i = 0; i<direction.numberOfTurns; i++)
-            orientation = orientation.next();
+        orientation = orientation.rotate(direction);
     }
 
-    public void addEnergy(int e)
-    {
+    public void addEnergy(int e) {
         energy+=e;
     }
 
-    public void takeEnergy(int e)
-    {
+    public void takeEnergy(int e) {
         energy-=e;
         if (energy<0)
             energy=0;
     }
 
-    private void moveInDir(MoveDirection direction)
-    {
+    private void moveInDir(MoveDirection direction) {
         rotate(direction);
         Vector2d newPosition = position.add(orientation.toUnitVector());
         Vector2d oldPosition = position;
@@ -56,16 +52,14 @@ public class Animal implements IMapElement{
         positionChanged(oldPosition);
     }
 
-    public void move()
-    {
+    public void move() {
         moveInDir(moves[currMove]);
         currMove++;
         if (currMove >= moves.length)
             currMove = 0;
     }
 
-    public void setPosition(Vector2d pos)
-    {
+    public void setPosition(Vector2d pos) {
         this.position = pos;
     }
 

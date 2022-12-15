@@ -49,10 +49,15 @@ public class SimulationStage extends Stage {
             gridPane.getRowConstraints().add(new RowConstraints(cellSize));
         for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++)
             gridPane.getColumnConstraints().add(new ColumnConstraints(cellSize));
+
         for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++) {
             for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
                 Rectangle r = new Rectangle(cellSize+1, cellSize+1);
-                r.setFill(Color.GREEN);
+
+                if (map.isPreferableForPlants( new Vector2d(x, y).add(map.getLowerLeft()) ))
+                    r.setFill(Color.DARKGREEN);
+                else
+                    r.setFill(Color.GREEN);
                 gridPane.add(r, x, map.getUpperRight().subtract(map.getLowerLeft()).y - y);
             }
         }

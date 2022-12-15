@@ -4,13 +4,13 @@ import java.util.Random;
 
 public enum MoveDirection {
     FORWARD(0),
-    BACKWARD(4),
-    RIGHT(2),
-    LEFT(6),
-    FORWARDLEFT(7),
-    BACKWARDLEFT(5),
     FORWARDRIGHT(1),
-    BACKWARDRIGHT(3);
+    RIGHT(2),
+    BACKWARDRIGHT(3),
+    BACKWARD(4),
+    BACKWARDLEFT(5),
+    LEFT(6),
+    FORWARDLEFT(7);
 
     public final int numberOfTurns;
     MoveDirection(int numberOfTurns) {
