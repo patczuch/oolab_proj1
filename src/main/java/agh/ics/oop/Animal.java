@@ -12,38 +12,55 @@ public class Animal implements IMapElement{
     private final MoveDirection[] moves;
     private final Random rand;
     private int currMove;
-    public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, int genesLength)
+    private int energy;
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, int genesLength, int energy)
     {
-        this(map,initialPosition,MoveDirection.randomMoves(rand,genesLength),MapDirection.getRandom(rand),rand);
+        this(map,initialPosition,MoveDirection.randomMoves(rand,genesLength),MapDirection.getRandom(rand),rand,energy);
     }
-    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, MapDirection initialOrientation, Random rand)
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, MapDirection initialOrientation, Random rand, int energy)
     {
         this.position = initialPosition;
         this.map = map;
         this.moves = moves;
         this.orientation = initialOrientation;
         this.rand = rand;
+        this.energy = energy;
         currMove = 0;
         map.placeAnimal(this);
     }
 
-    private void moveInDir(MoveDirection direction)
+    public void rotate(MoveDirection direction)
     {
         orientation = orientation.rotate(direction);
+    }
+
+    public void addEnergy(int e) {
+        energy+=e;
+    }
+
+    public void takeEnergy(int e) {
+        energy-=e;
+        if (energy<0)
+            energy=0;
+    }
+
+    private void moveInDir(MoveDirection direction) {
+        rotate(direction);
         Vector2d newPosition = position.add(orientation.toUnitVector());
-        if (!map.canMoveTo(newPosition))
-            return;
         Vector2d oldPosition = position;
         position = newPosition;
         positionChanged(oldPosition);
     }
 
-    public void move()
-    {
+    public void move() {
         moveInDir(moves[currMove]);
         currMove++;
         if (currMove >= moves.length)
             currMove = 0;
+    }
+
+    public void setPosition(Vector2d pos) {
+        this.position = pos;
     }
 
     public int hashCode() {

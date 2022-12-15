@@ -9,16 +9,18 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
     private final Vector2d upperRight;
     private final HashMap<Vector2d, ArrayList<Animal>> animals;
     private final HashMap<Vector2d, Plant> plants;
+    protected final SimulationConfig config;
     Random rand;
-    protected AbstractWorldMap(int width, int height, Random rand) {
+    protected AbstractWorldMap(SimulationConfig config, Random rand) {
         animals = new HashMap<>();
         plants = new HashMap<>();
         lowerLeft = new Vector2d(0,0);
-        upperRight = new Vector2d(width-1,height-1);
+        upperRight = new Vector2d(config.mapWidth-1,config.mapHeight-1);
         this.rand = rand;
+        this.config = config;
     }
 
-    public boolean canMoveTo(Vector2d position) {
+    public boolean isInMap(Vector2d position) {
         return position.follows(getLowerLeft()) && position.precedes(getUpperRight());
     }
 
@@ -37,6 +39,8 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
     {
         animals.get(oldPosition).remove(a);
         a.removeObserver(this);
+        if(!isInMap(a.getPosition()))
+            outOfMap(oldPosition,a);
         placeAnimal(a);
     }
 
@@ -68,6 +72,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
     public Vector2d getLowerLeft() {
         return lowerLeft;
     }
+
     public Vector2d getUpperRight() {
         return upperRight;
     }
@@ -75,4 +80,6 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
     public boolean isPreferableForPlants(Vector2d position) {
         return false;
     }
+
+    protected abstract void outOfMap(Vector2d oldPos, Animal a);
 }
