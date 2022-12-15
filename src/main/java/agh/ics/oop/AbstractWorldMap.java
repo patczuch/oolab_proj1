@@ -42,7 +42,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
 
     public Vector2d randomPosition()
     {
-        return new Vector2d(rand.nextInt(getUpperRight().x),rand.nextInt(getUpperRight().y));
+        return new Vector2d(rand.nextInt(getUpperRight().x + 1), rand.nextInt(getUpperRight().y + 1));
     }
 
     public Plant plantAt(Vector2d position) {
@@ -54,6 +54,15 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver{
     }
     public ArrayList<Animal> animalsAt(Vector2d position) {
         return animals.get(position);
+    }
+    public boolean isAnimalAt(Vector2d position) {
+        return animalsAt(position) != null && animalsAt(position).size() > 0;
+    }
+
+    public void debugAnimals() {
+//        for (Vector2d pos : animals.keySet())
+//            System.out.println(pos);
+        System.out.println(animals.size());
     }
 
     public Vector2d getLowerLeft() {

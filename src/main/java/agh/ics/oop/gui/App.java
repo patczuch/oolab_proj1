@@ -33,7 +33,7 @@ public class App extends Application {
                 new NumberConstraint(0,Integer.MAX_VALUE),
                 new NumberConstraint(0,Integer.MAX_VALUE));
         SimulationConfig simulationConfig = new SimulationConfig(25,25, SimulationTypes.MapType.EARTH,30,
-                10, 10, SimulationTypes.PlantGrowingType.TOXICDEAD,10,10,
+                10, 2, SimulationTypes.PlantGrowingType.FORESTYEQUATORS,10,10,
                 10,5, 5,10,
                 SimulationTypes.AnimalMutationType.FULLYRANDOM,20, SimulationTypes.AnimalBehaviourType.FULLYDETERMINED, 250);
         SimulationConfigInput simulationConfigInput = new SimulationConfigInput(simulationConfig,inputValuesConstraints);
