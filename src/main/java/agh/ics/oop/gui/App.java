@@ -48,6 +48,7 @@ public class App extends Application {
                 seed = new Random().nextInt();
             else
                 seed = seedInput.getValue();
+            System.out.println(seed);
             new SimulationStage(simulationConfigInput.getSimulationConfig(), imageDictionary, seed);
         });
         primaryStage.setTitle("Konfiguracja symulacji");

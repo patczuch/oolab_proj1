@@ -8,23 +8,26 @@ public class Animal implements IMapElement{
     private MapDirection orientation;
     private Vector2d position;
     private final AbstractWorldMap map;
-    public ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
+    public ArrayList<IPositionChangeObserver> positionObservers = new ArrayList<>();
+    public ArrayList<IDeathObserver> deathObservers = new ArrayList<>();
     private final MoveDirection[] moves;
     private final Random rand;
     private int currMove;
     private int energy;
-    public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, int genesLength, int energy)
+    private SimulationConfig config;
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, SimulationConfig config)
     {
-        this(map,initialPosition,MoveDirection.randomMoves(rand,genesLength),MapDirection.getRandom(rand),rand,energy);
+        this(map,initialPosition,MoveDirection.randomMoves(rand,config.animalGenesLength),MapDirection.getRandom(rand),rand,config);
     }
-    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, MapDirection initialOrientation, Random rand, int energy)
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, MapDirection initialOrientation, Random rand, SimulationConfig config)
     {
         this.position = initialPosition;
         this.map = map;
         this.moves = moves;
         this.orientation = initialOrientation;
         this.rand = rand;
-        this.energy = energy;
+        this.config = config;
+        this.energy = config.startAnimalEnergy;
         currMove = 0;
         map.placeAnimal(this);
     }
@@ -39,9 +42,12 @@ public class Animal implements IMapElement{
     }
 
     public void takeEnergy(int e) {
-        energy-=e;
-        if (energy<0)
-            energy=0;
+        energy -= e;
+    }
+
+    public int getEnergy()
+    {
+        return energy;
     }
 
     private void moveInDir(MoveDirection direction) {
@@ -50,6 +56,7 @@ public class Animal implements IMapElement{
         Vector2d oldPosition = position;
         position = newPosition;
         positionChanged(oldPosition);
+        takeEnergy(1);
     }
 
     public void move() {
@@ -93,17 +100,30 @@ public class Animal implements IMapElement{
     {
         return position;
     }
-    public void addObserver(IPositionChangeObserver observer)
+    public void addPosObserver(IPositionChangeObserver observer)
     {
-        observers.add(observer);
+        positionObservers.add(observer);
     }
-    public void removeObserver(IPositionChangeObserver observer)
+    public void removePosObserver(IPositionChangeObserver observer)
     {
-        observers.remove(observer);
+        positionObservers.remove(observer);
+    }
+    public void addDeathObserver(IDeathObserver observer)
+    {
+        deathObservers.add(observer);
+    }
+    public void removeDeathObserver(IDeathObserver observer)
+    {
+        deathObservers.remove(observer);
     }
     private void positionChanged(Vector2d oldPosition)
     {
-        for (IPositionChangeObserver observer : observers)
+        for (IPositionChangeObserver observer : positionObservers)
             observer.positionChanged(this, oldPosition);
+    }
+    public void die()
+    {
+        for (IDeathObserver observer : deathObservers)
+            observer.died(this);
     }
 }

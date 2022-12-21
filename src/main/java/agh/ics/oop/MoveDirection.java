@@ -21,7 +21,7 @@ public enum MoveDirection {
     {
         MoveDirection[] genes = new MoveDirection[l];
         for (int i = 0; i<l; i++)
-            genes[i] = MoveDirection.values()[rand.nextInt()&Integer.MAX_VALUE%MoveDirection.values().length];
+            genes[i] = MoveDirection.values()[rand.nextInt(MoveDirection.values().length)];
         return genes;
     }
 }

@@ -12,6 +12,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -22,11 +24,14 @@ public class SimulationStage extends Stage {
     AbstractWorldMap map;
     Random random;
     private final HashMap<Vector2d, ImageView> objects;
+    private final HashMap<Vector2d, Rectangle> background;
+
     SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, int seed)
     {
         super();
         this.imageDictionary = imageDictionary;
         objects = new HashMap<>();
+        background = new HashMap<>();
         gridPane = new GridPane();
         random = new Random(seed);
         SimulationEngine engine = new SimulationEngine(config,random,this);
@@ -50,7 +55,27 @@ public class SimulationStage extends Stage {
         for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++)
             gridPane.getColumnConstraints().add(new ColumnConstraints(cellSize));
 
-        for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++) {
+        ArrayList<Vector2d> jungleFields = map.getPreferredFields();
+        for (Vector2d v: jungleFields)
+        {
+            Rectangle r = new Rectangle(cellSize+1, cellSize+1);
+            r.setFill(Color.DARKGREEN);
+            gridPane.add(r, v.x, map.getUpperRight().subtract(map.getLowerLeft()).y - v.y);
+            background.put(v,r);
+        }
+        ArrayList<Vector2d> grassFields = new ArrayList<>();
+        for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++)
+            for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++)
+                grassFields.add(new Vector2d(x,y));
+        grassFields.removeAll(jungleFields);
+        for (Vector2d v: grassFields)
+        {
+            Rectangle r = new Rectangle(cellSize+1, cellSize+1);
+            r.setFill(Color.GREEN);
+            gridPane.add(r, v.x, map.getUpperRight().subtract(map.getLowerLeft()).y - v.y);
+            background.put(v,r);
+        }
+        /*for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++) {
             for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
                 Rectangle r = new Rectangle(cellSize+1, cellSize+1);
 
@@ -58,9 +83,10 @@ public class SimulationStage extends Stage {
                     r.setFill(Color.DARKGREEN);
                 else
                     r.setFill(Color.GREEN);
+                r.setFill(Color.GREEN);
                 gridPane.add(r, x, map.getUpperRight().subtract(map.getLowerLeft()).y - y);
             }
-        }
+        }*/
     }
 
     public void update(Vector2d pos)
@@ -81,5 +107,13 @@ public class SimulationStage extends Stage {
             gridPane.add(imgV, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
             objects.put(pos, imgV);
         }
+    }
+
+    public void updateBackground()
+    {
+        for (Vector2d v: map.getPreferredFields())
+            background.get(v).setFill(Color.DARKGREEN);
+        for (Vector2d v: map.getNotPreferredFields())
+            background.get(v).setFill(Color.GREEN);
     }
 }
