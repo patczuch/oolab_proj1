@@ -54,39 +54,13 @@ public class SimulationStage extends Stage {
             gridPane.getRowConstraints().add(new RowConstraints(cellSize));
         for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++)
             gridPane.getColumnConstraints().add(new ColumnConstraints(cellSize));
-
-        ArrayList<Vector2d> jungleFields = map.getPreferredFields();
-        for (Vector2d v: jungleFields)
-        {
-            Rectangle r = new Rectangle(cellSize+1, cellSize+1);
-            r.setFill(Color.DARKGREEN);
-            gridPane.add(r, v.x, map.getUpperRight().subtract(map.getLowerLeft()).y - v.y);
-            background.put(v,r);
-        }
-        ArrayList<Vector2d> grassFields = new ArrayList<>();
         for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++)
-            for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++)
-                grassFields.add(new Vector2d(x,y));
-        grassFields.removeAll(jungleFields);
-        for (Vector2d v: grassFields)
-        {
-            Rectangle r = new Rectangle(cellSize+1, cellSize+1);
-            r.setFill(Color.GREEN);
-            gridPane.add(r, v.x, map.getUpperRight().subtract(map.getLowerLeft()).y - v.y);
-            background.put(v,r);
-        }
-        /*for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++) {
             for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
-                Rectangle r = new Rectangle(cellSize+1, cellSize+1);
-
-                if (map.isPreferableForPlants( new Vector2d(x, y).add(map.getLowerLeft()) ))
-                    r.setFill(Color.DARKGREEN);
-                else
-                    r.setFill(Color.GREEN);
-                r.setFill(Color.GREEN);
+                Rectangle r = new Rectangle(cellSize, cellSize);
+                background.put(new Vector2d(x,y),r);
                 gridPane.add(r, x, map.getUpperRight().subtract(map.getLowerLeft()).y - y);
             }
-        }*/
+        updateBackground();
     }
 
     public void update(Vector2d pos)

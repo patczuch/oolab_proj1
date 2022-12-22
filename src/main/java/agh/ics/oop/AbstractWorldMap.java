@@ -116,6 +116,15 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         return new Animal(this, randomPosition(),rand,config);
     }
 
+    public Animal spawnBredAnimal(Animal a1, Animal a2) {
+        //TODO GENES AND MUTATIONS
+        a1.takeEnergy(config.breedingEnergyUsedAnimal);
+        a1.addChild();
+        a2.takeEnergy(config.breedingEnergyUsedAnimal);
+        a2.addChild();
+        return new Animal(this,a1.getPosition(),rand,config,config.breedingEnergyUsedAnimal*2);
+    }
+
     public void placePlant(Plant p) {
         plants.put(p.getPosition(),p);
         p.addDeathObserver(this);

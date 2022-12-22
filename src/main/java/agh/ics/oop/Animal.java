@@ -14,7 +14,15 @@ public class Animal implements IMapElement{
     private final Random rand;
     private int currMove;
     private int energy;
+    private int age;
+    private int childrenAmount;
     private SimulationConfig config;
+
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, SimulationConfig config, int startEnergy)
+    {
+        this(map,initialPosition,MoveDirection.randomMoves(rand,config.animalGenesLength),MapDirection.getRandom(rand),rand,config);
+        this.energy = startEnergy;
+    }
     public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, SimulationConfig config)
     {
         this(map,initialPosition,MoveDirection.randomMoves(rand,config.animalGenesLength),MapDirection.getRandom(rand),rand,config);
@@ -29,6 +37,8 @@ public class Animal implements IMapElement{
         this.config = config;
         this.energy = config.startAnimalEnergy;
         currMove = 0;
+        age = 0;
+        childrenAmount = 0;
         map.placeAnimal(this);
     }
 
@@ -57,6 +67,7 @@ public class Animal implements IMapElement{
         position = newPosition;
         positionChanged(oldPosition);
         takeEnergy(1);
+        age++;
     }
 
     public void move() {
@@ -125,5 +136,20 @@ public class Animal implements IMapElement{
     {
         for (IDeathObserver observer : deathObservers)
             observer.died(this);
+    }
+
+    public int getAge()
+    {
+        return age;
+    }
+
+    public int getChildrenAmount()
+    {
+        return childrenAmount;
+    }
+
+    public void addChild()
+    {
+        childrenAmount++;
     }
 }

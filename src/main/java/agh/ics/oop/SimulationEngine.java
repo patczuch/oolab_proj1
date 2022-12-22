@@ -5,12 +5,9 @@ import agh.ics.oop.gui.SimulationStage;
 import javafx.application.Platform;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.*;
 
 import java.lang.Thread;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
 public class SimulationEngine implements Runnable, IPositionChangeObserver, IDeathObserver{
     public final AbstractWorldMap map;
@@ -76,15 +73,49 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
             for (Animal a : animals)
                 a.move();
 
+            TreeSet<Animal> set = new TreeSet<>((a1, a2) -> {
+                if (a1.equals(a2))
+                    return 0;
+                if (a1.getEnergy() != a2.getEnergy())
+                    return a2.getEnergy() - a1.getEnergy();
+                if (a1.getAge() != a2.getAge())
+                    return a2.getAge() - a1.getAge();
+                if (a1.getChildrenAmount() != a2.getChildrenAmount())
+                    return a2.getChildrenAmount() - a1.getChildrenAmount();
+                return a1.toString().compareTo(a2.toString());
+            });
+
             for (Animal a : animals)
             {
                 if (map.isPlantAt(a.getPosition())) {
-                    a.addEnergy(config.plantEnergy);
+                    set.clear();
+                    set.addAll(map.animalsAt(a.getPosition()));
+                    set.first().addEnergy(config.plantEnergy);
                     map.plantAt(a.getPosition()).die();
+                    toUpdate.add(a.getPosition());
                 }
             }
 
-            //TODO BREEDING
+            for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++){
+                for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
+                    Vector2d v = new Vector2d(x, y);
+                    if (map.animalsAt(v) != null) {
+                        set.clear();
+                        set.addAll(map.animalsAt(v));
+                    }
+                    set.removeIf(a -> a.getEnergy() < config.fedAnimalEnergy);
+                    if (set.size() >= 2) {
+                        Animal a1 = set.first();
+                        set.remove(a1);
+                        Animal child = map.spawnBredAnimal(a1,set.first());
+                        animals.add(child);
+                        child.addPosObserver(this);
+                        child.addDeathObserver(this);
+                        toUpdate.add(v);
+                        //System.out.println("New animal!");
+                    }
+                }
+            }
 
             for(int i=0; i<config.plantGrowingNumber; i++) {
                 Plant p = map.spawnRandomPlant();
