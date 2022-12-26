@@ -1,6 +1,9 @@
 package agh.ics.oop;
 
+import javafx.scene.effect.ColorAdjust;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
@@ -10,7 +13,7 @@ public class Animal implements IMapElement{
     private final AbstractWorldMap map;
     public ArrayList<IPositionChangeObserver> positionObservers = new ArrayList<>();
     public ArrayList<IDeathObserver> deathObservers = new ArrayList<>();
-    private final MoveDirection[] moves;
+    public final MoveDirection[] moves;
     private final Random rand;
     private int currMove;
     private int energy;
@@ -18,9 +21,9 @@ public class Animal implements IMapElement{
     private int childrenAmount;
     private SimulationConfig config;
 
-    public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, SimulationConfig config, int startEnergy)
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, Random rand, SimulationConfig config, int startEnergy)
     {
-        this(map,initialPosition,MoveDirection.randomMoves(rand,config.animalGenesLength),MapDirection.getRandom(rand),rand,config);
+        this(map,initialPosition,moves,MapDirection.getRandom(rand),rand,config);
         this.energy = startEnergy;
     }
     public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, SimulationConfig config)
@@ -75,12 +78,13 @@ public class Animal implements IMapElement{
         currMove++;
         if (currMove >= moves.length)
             currMove = 0;
+        if (config.animalBehaviourType == SimulationTypes.AnimalBehaviourType.SLIGHTLYCRAZY && rand.nextFloat() >= 0.8)
+            currMove = rand.nextInt(config.animalGenesLength);
     }
 
     public void setPosition(Vector2d pos) {
         this.position = pos;
     }
-
     public int hashCode() {
         return Objects.hash(orientation, position);
     }
@@ -151,5 +155,13 @@ public class Animal implements IMapElement{
     public void addChild()
     {
         childrenAmount++;
+    }
+
+    public ColorAdjust getColorAdjust() {
+        ColorAdjust colorAdjust = new ColorAdjust();
+        colorAdjust.setHue(0.6 * Math.min((double)energy/config.fedAnimalEnergy,1));
+        colorAdjust.setBrightness(0);
+        colorAdjust.setSaturation(1);
+        return colorAdjust;
     }
 }

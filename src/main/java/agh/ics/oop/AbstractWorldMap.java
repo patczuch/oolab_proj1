@@ -83,7 +83,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         int firstPossibleIndex = -1;
         int secondPossibleIndex = -1;
         for (int i = 0; i<plantPreferredFields.size();i++)
-            if (plantPreferredFields.get(i).size() > 0) {
+            if (plantPreferredFields.get(i).size() > 0)
                 if (firstPossibleIndex == -1)
                     firstPossibleIndex = i;
                 else
@@ -91,7 +91,6 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
                     secondPossibleIndex = i;
                     break;
                 }
-            }
 
         if (firstPossibleIndex == -1)
             return null;
@@ -116,13 +115,56 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         return new Animal(this, randomPosition(),rand,config);
     }
 
-    public Animal spawnBredAnimal(Animal a1, Animal a2) {
-        //TODO GENES AND MUTATIONS
+    public Animal spawnBredAnimal(Animal _a1, Animal _a2) {
+        Animal a1;
+        Animal a2;
+
+        if (_a1.getEnergy() > _a2.getEnergy())
+        {
+            a1 = _a1;
+            a2 = _a2;
+        }
+        else
+        {
+            a1 = _a2;
+            a2 = _a1;
+        }
+
         a1.takeEnergy(config.breedingEnergyUsedAnimal);
         a1.addChild();
         a2.takeEnergy(config.breedingEnergyUsedAnimal);
         a2.addChild();
-        return new Animal(this,a1.getPosition(),rand,config,config.breedingEnergyUsedAnimal*2);
+
+        boolean side = rand.nextBoolean();
+        MoveDirection[] moves = new MoveDirection[config.animalGenesLength];
+        if (side)
+            for(int i = 0; i<config.animalGenesLength; i++)
+                if (i < ((double) a1.getEnergy()/(a1.getEnergy()+a2.getEnergy()))*config.animalGenesLength)
+                    moves[i] = a1.moves[i];
+                else
+                    moves[i] = a2.moves[i];
+        else
+            for(int i = config.animalGenesLength-1; i>=0; i--)
+                if (i >= config.animalGenesLength - ((double)a1.getEnergy()/(a1.getEnergy()+a2.getEnergy())) * config.animalGenesLength)
+                    moves[i] = a1.moves[i];
+                else
+                    moves[i] = a2.moves[i];
+
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < config.animalGenesLength; i++)
+            indices.add(i);
+        Collections.shuffle(indices);
+        indices = indices.subList(0,config.minAnimalMutationsNumber + rand.nextInt(1 + config.maxAnimalMutationsNumber - config.minAnimalMutationsNumber));
+
+        if(config.animalMutationType == SimulationTypes.AnimalMutationType.FULLYRANDOM)
+            for(int i : indices)
+                moves[i] = MoveDirection.random(rand);
+
+        if(config.animalMutationType == SimulationTypes.AnimalMutationType.LESSRANDOM)
+            for(int i : indices)
+                moves[i] = rand.nextBoolean() ? moves[i].previous() : moves[i].next();
+
+        return new Animal(this,a1.getPosition(),moves,rand,config,config.breedingEnergyUsedAnimal*2);
     }
 
     public void placePlant(Plant p) {

@@ -1,5 +1,7 @@
 package agh.ics.oop;
 
+import javafx.scene.effect.ColorAdjust;
+
 import java.util.ArrayList;
 
 public class Plant implements IMapElement{
@@ -17,7 +19,15 @@ public class Plant implements IMapElement{
     public Vector2d getPosition() {
         return position;
     }
-    @Override
+
+    public ColorAdjust getColorAdjust() {
+        ColorAdjust colorAdjust = new ColorAdjust();
+        colorAdjust.setHue(0.65);
+        colorAdjust.setBrightness(0);
+        colorAdjust.setSaturation(0.75);
+        return colorAdjust;
+    }
+
     public String getTexturePath() {
         return "grass.png";
     }

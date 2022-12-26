@@ -24,4 +24,23 @@ public enum MoveDirection {
             genes[i] = MoveDirection.values()[rand.nextInt(MoveDirection.values().length)];
         return genes;
     }
+
+    public static MoveDirection random(Random rand)
+    {
+        return MoveDirection.values()[rand.nextInt(MoveDirection.values().length)];
+    }
+
+    public MoveDirection next()
+    {
+        if (this.ordinal()+1 >= MoveDirection.values().length)
+            return MoveDirection.values()[0];
+        return MoveDirection.values()[this.ordinal()+1];
+    }
+
+    public MoveDirection previous()
+    {
+        if (this.ordinal()-1 < 0)
+            return MoveDirection.values()[MoveDirection.values().length-1];
+        return MoveDirection.values()[this.ordinal()-1];
+    }
 }

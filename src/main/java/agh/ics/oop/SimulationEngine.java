@@ -16,11 +16,11 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     private final SimulationConfig config;
     private final SimulationStage stage;
     private boolean stop = false;
-    private final HashSet<Vector2d> toUpdate;
+    private final ArrayList<Vector2d> toUpdate;
     Random rand;
     public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
     {
-        toUpdate = new HashSet<>();
+        toUpdate = new ArrayList<>();
         this.config = config;
         switch(config.mapType)
         {
@@ -49,13 +49,6 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 toUpdate.add(p.getPosition());
             }
         }
-
-        Platform.runLater(() -> {
-            for (Vector2d v : toUpdate)
-                stage.update(v);
-            toUpdate.clear();
-            stage.updateBackground();
-        });
     }
 
     @Override
@@ -63,6 +56,17 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         while (true) {
             if (stop)
                 return;
+
+            Platform.runLater(() -> {
+                ArrayList<Vector2d> updated = new ArrayList<>();
+                for (int i = 0; i<toUpdate.size(); i++) {
+                    Vector2d v = toUpdate.get(i);
+                    stage.update(v);
+                    updated.add(v);
+                }
+                toUpdate.removeAll(updated);
+                //stage.updateBackground();
+            });
 
             for (int i = 0; i<animals.size(); i++)
                 if (animals.get(i).getEnergy() <= 0) {
@@ -105,19 +109,19 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     }
                     set.removeIf(a -> a.getEnergy() < config.fedAnimalEnergy);
                     if (set.size() >= 2) {
-                        Animal a1 = set.first();
-                        set.remove(a1);
-                        Animal child = map.spawnBredAnimal(a1,set.first());
+                        Animal a = set.first();
+                        set.remove(a);
+                        Animal child = map.spawnBredAnimal(a,set.first());
                         animals.add(child);
                         child.addPosObserver(this);
                         child.addDeathObserver(this);
-                        toUpdate.add(v);
+                        //toUpdate.add(v);
                         //System.out.println("New animal!");
                     }
                 }
             }
 
-            for(int i=0; i<config.plantGrowingNumber; i++) {
+            for(int i = 0; i < config.plantGrowingNumber; i++) {
                 Plant p = map.spawnRandomPlant();
                 if (p != null) {
                     plants.add(p);
@@ -125,13 +129,6 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     toUpdate.add(p.getPosition());
                 }
             }
-
-            Platform.runLater(() -> {
-                for (Vector2d v : toUpdate)
-                    stage.update(v);
-                toUpdate.clear();
-                stage.updateBackground();
-            });
 
             try {
                 Thread.sleep(config.moveDelay);

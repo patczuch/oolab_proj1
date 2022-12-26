@@ -49,7 +49,7 @@ public class App extends Application {
             else
                 seed = seedInput.getValue();
             System.out.println(seed);
-            new SimulationStage(simulationConfigInput.getSimulationConfig(), imageDictionary, seed);
+            new SimulationStage(simulationConfigInput.getSimulationConfig(), imageDictionary, new Random(seed));
         });
         primaryStage.setTitle("Konfiguracja symulacji");
         primaryStage.setScene(scene);

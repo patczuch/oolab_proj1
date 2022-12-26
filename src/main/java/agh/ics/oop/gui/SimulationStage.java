@@ -3,7 +3,10 @@ package agh.ics.oop.gui;
 import agh.ics.oop.*;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -22,26 +25,27 @@ public class SimulationStage extends Stage {
     public final double cellSize;
     ImageDictionary imageDictionary;
     AbstractWorldMap map;
-    Random random;
     private final HashMap<Vector2d, ImageView> objects;
     private final HashMap<Vector2d, Rectangle> background;
 
-    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, int seed)
+    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, Random rand)
     {
         super();
         this.imageDictionary = imageDictionary;
         objects = new HashMap<>();
         background = new HashMap<>();
         gridPane = new GridPane();
-        random = new Random(seed);
-        SimulationEngine engine = new SimulationEngine(config,random,this);
+        SimulationEngine engine = new SimulationEngine(config,rand,this);
         map = engine.map;
         Thread simulationThread = new Thread(engine);
         setTitle("Symulacja");
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         cellSize = Math.min(screenBounds.getWidth()/config.mapWidth*0.9,screenBounds.getHeight()/config.mapHeight*0.9);
         createBackground();
-        setScene(new Scene(gridPane, config.mapWidth*cellSize, config.mapHeight*cellSize));
+        BorderPane pane = new BorderPane();
+        //pane.setLeft(new Label("TODO Controls"));
+        pane.setCenter(gridPane);
+        setScene(new Scene(pane, config.mapWidth*cellSize, config.mapHeight*cellSize));
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
         show();
@@ -78,6 +82,7 @@ public class SimulationStage extends Stage {
             ImageView imgV = new ImageView(imageDictionary.getImage(el.getTexturePath()));
             imgV.setFitWidth(cellSize);
             imgV.setFitHeight(cellSize);
+            imgV.setEffect(el.getColorAdjust());
             gridPane.add(imgV, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
             objects.put(pos, imgV);
         }
