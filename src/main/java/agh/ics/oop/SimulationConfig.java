@@ -1,6 +1,7 @@
 package agh.ics.oop;
 
 import agh.ics.oop.SimulationTypes.*;
+import org.json.simple.JSONObject;
 
 public class SimulationConfig {
     public final int mapHeight;
@@ -41,5 +42,50 @@ public class SimulationConfig {
         this.animalGenesLength = animalGenesLength;
         this.animalBehaviourType = animalBehaviourType;
         this.moveDelay = moveDelay;
+    }
+
+    public SimulationConfig(JSONObject jsonObject)
+    {
+        this.mapHeight = (int) (long) jsonObject.get("mapHeight");
+        this.mapWidth = (int) (long) jsonObject.get("mapWidth");
+        this.mapType = MapType.values()[(int) (long)jsonObject.get("mapType")];
+        this.plantNumber = (int) (long) jsonObject.get("plantNumber");
+        this.plantEnergy = (int) (long) jsonObject.get("plantEnergy");
+        this.plantGrowingNumber = (int) (long) jsonObject.get("plantGrowingNumber");
+        this.plantGrowingType = PlantGrowingType.values()[(int) (long)jsonObject.get("plantGrowingType")];
+        this.startAnimalNumber = (int) (long) jsonObject.get("startAnimalNumber");
+        this.startAnimalEnergy = (int) (long) jsonObject.get("startAnimalEnergy");
+        this.fedAnimalEnergy = (int) (long) jsonObject.get("fedAnimalEnergy");
+        this.breedingEnergyUsedAnimal = (int) (long) jsonObject.get("breedingEnergyUsedAnimal");
+        this.minAnimalMutationsNumber = (int) (long) jsonObject.get("minAnimalMutationsNumber");
+        this.maxAnimalMutationsNumber = (int) (long) jsonObject.get("maxAnimalMutationsNumber");
+        this.animalMutationType = AnimalMutationType.values()[(int) (long)jsonObject.get("animalMutationType")];
+        this.animalGenesLength = (int) (long) jsonObject.get("animalGenesLength");
+        this.animalBehaviourType = AnimalBehaviourType.values()[(int) (long)jsonObject.get("animalBehaviourType")];
+        this.moveDelay = (int) (long) jsonObject.get("moveDelay");
+    }
+
+    public JSONObject toJsonObject(String name)
+    {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", name);
+        jsonObject.put("mapHeight", mapHeight);
+        jsonObject.put("mapWidth", mapWidth);
+        jsonObject.put("mapType", mapType.ordinal());
+        jsonObject.put("plantNumber", plantNumber);
+        jsonObject.put("plantEnergy", plantEnergy);
+        jsonObject.put("plantGrowingNumber", plantGrowingNumber);
+        jsonObject.put("plantGrowingType", plantGrowingType.ordinal());
+        jsonObject.put("startAnimalNumber", startAnimalNumber);
+        jsonObject.put("startAnimalEnergy", startAnimalEnergy);
+        jsonObject.put("fedAnimalEnergy", fedAnimalEnergy);
+        jsonObject.put("breedingEnergyUsedAnimal", breedingEnergyUsedAnimal);
+        jsonObject.put("minAnimalMutationsNumber", minAnimalMutationsNumber);
+        jsonObject.put("maxAnimalMutationsNumber", maxAnimalMutationsNumber);
+        jsonObject.put("animalMutationType", animalMutationType.ordinal());
+        jsonObject.put("animalGenesLength", animalGenesLength);
+        jsonObject.put("animalBehaviourType", animalBehaviourType.ordinal());
+        jsonObject.put("moveDelay", moveDelay);
+        return jsonObject;
     }
 }

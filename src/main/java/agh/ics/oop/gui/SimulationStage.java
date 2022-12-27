@@ -6,10 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
@@ -42,10 +39,18 @@ public class SimulationStage extends Stage {
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         cellSize = Math.min(screenBounds.getWidth()/config.mapWidth*0.9,screenBounds.getHeight()/config.mapHeight*0.9);
         createBackground();
+
+
+        VBox controls = new VBox();
+        controls.setMinWidth(100);
+        controls.setMaxWidth(100);
+        controls.setPrefWidth(100);
+
         BorderPane pane = new BorderPane();
-        //pane.setLeft(new Label("TODO Controls"));
+        //pane.setLeft(controls);
         pane.setCenter(gridPane);
-        setScene(new Scene(pane, config.mapWidth*cellSize, config.mapHeight*cellSize));
+        setScene(new Scene(pane, config.mapWidth*cellSize/* + controls.getWidth()*/, config.mapHeight*cellSize));
+
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
         show();
@@ -76,8 +81,12 @@ public class SimulationStage extends Stage {
         IMapElement el = null;
         if (map.isPlantAt(pos))
             el = map.plantAt(pos);
-        if (map.animalsAt(pos) != null && map.animalsAt(pos).size() > 0)
-            el = map.animalsAt(pos).get(map.animalsAt(pos).size()-1);
+        ArrayList<Animal> temp = map.animalsAt(pos);
+        if (temp != null) {
+            int temp_size = temp.size();
+            if (temp_size > 0)
+                el = temp.get(temp_size - 1);
+        }
         if (el != null) {
             ImageView imgV = new ImageView(imageDictionary.getImage(el.getTexturePath()));
             imgV.setFitWidth(cellSize);
@@ -90,9 +99,11 @@ public class SimulationStage extends Stage {
 
     public void updateBackground()
     {
-        for (Vector2d v: map.getPreferredFields())
-            background.get(v).setFill(Color.DARKGREEN);
-        for (Vector2d v: map.getNotPreferredFields())
-            background.get(v).setFill(Color.GREEN);
+        ArrayList<Vector2d> temp = map.getPreferredFields();
+        for (int i = 0; i < temp.size(); i++)
+            background.get(temp.get(i)).setFill(Color.DARKGREEN);
+        ArrayList<Vector2d> temp2 = map.getNotPreferredFields();
+        for (int i = 0; i < temp2.size(); i++)
+            background.get(temp2.get(i)).setFill(Color.GREEN);
     }
 }

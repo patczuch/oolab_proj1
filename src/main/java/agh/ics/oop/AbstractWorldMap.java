@@ -164,7 +164,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
             for(int i : indices)
                 moves[i] = rand.nextBoolean() ? moves[i].previous() : moves[i].next();
 
-        return new Animal(this,a1.getPosition(),moves,rand,config,config.breedingEnergyUsedAnimal*2);
+        return new Animal(this,a1.getPosition(),moves,true,rand,config,config.breedingEnergyUsedAnimal*2);
     }
 
     public void placePlant(Plant p) {

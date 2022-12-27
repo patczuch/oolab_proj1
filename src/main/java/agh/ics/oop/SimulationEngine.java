@@ -65,7 +65,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     updated.add(v);
                 }
                 toUpdate.removeAll(updated);
-                //stage.updateBackground();
+                stage.updateBackground();
             });
 
             for (int i = 0; i<animals.size(); i++)

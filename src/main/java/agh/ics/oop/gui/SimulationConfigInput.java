@@ -2,6 +2,7 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.SimulationConfig;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -98,6 +99,10 @@ public class SimulationConfigInput extends GridPane {
         this.add(animalBehaviourTypeInput,1,15);
         this.add(new Label("Opóźnienie pomiędzy ruchami:"),0,16);
         this.add(moveDelayInput,1,16);
+
+        this.setPadding(new Insets(20,20,20,20));
+        this.setHgap(10);
+        this.setVgap(5);
     }
 
     public SimulationConfig getSimulationConfig()
