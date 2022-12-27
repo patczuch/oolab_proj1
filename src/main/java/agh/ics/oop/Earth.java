@@ -19,10 +19,4 @@ public class Earth extends AbstractWorldMap{
         else if (a.getPosition().x > getUpperRight().x)
             a.setPosition(new Vector2d(getLowerLeft().x,a.getPosition().y));
     }
-
-    @Override
-    public boolean isPreferableForPlants(Vector2d position) {
-        int height = (this.getUpperRight().subtract(this.getLowerLeft())).y + 1;
-        return Math.abs(height / 2 - position.y) <= 0.1 * height;
-    }
 }

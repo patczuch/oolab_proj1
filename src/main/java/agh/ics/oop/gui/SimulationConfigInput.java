@@ -70,7 +70,7 @@ public class SimulationConfigInput extends GridPane {
         this.add(mapWidthInput,1,1);
         this.add(new Label("Wariant mapy:"),0,2);
         this.add(mapTypeInput,1,2);
-        this.add(new Label("Startowa liczba roślin:"),0,3);
+        this.add(new Label("Początkowa liczba roślin:"),0,3);
         this.add(plantNumberInput,1,3);
         this.add(new Label("Energia roślin:"),0,4);
         this.add(plantEnergyInput,1,4);

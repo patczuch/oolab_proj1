@@ -5,23 +5,22 @@ import agh.ics.oop.gui.SimulationStage;
 import javafx.application.Platform;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.*;
 
 import java.lang.Thread;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
-public class SimulationEngine implements Runnable{
+public class SimulationEngine implements Runnable, IPositionChangeObserver, IDeathObserver{
     public final AbstractWorldMap map;
     private final ArrayList<Animal> animals;
-//    private final ArrayList<Plant> plants;
+    private final ArrayList<Plant> plants;
     private final SimulationConfig config;
     private final SimulationStage stage;
     private boolean stop = false;
+    private final ArrayList<Vector2d> toUpdate;
     Random rand;
     public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
     {
+        toUpdate = new ArrayList<>();
         this.config = config;
         switch(config.mapType)
         {
@@ -33,76 +32,103 @@ public class SimulationEngine implements Runnable{
         this.rand = rand;
 
         animals = new ArrayList<>();
-        for (int i = 0; i < config.startAnimalNumber; i++)
-            animals.add(createRandomAnimal());
-
-        ArrayList<Plant> plants = new ArrayList<>();
-        for (int i = 0; i < config.plantNumber; i++) {
-            Plant p = createRandomPlant();
-            map.placePlant(p);
-            plants.add(p);
+        for (int i = 0; i < config.startAnimalNumber; i++) {
+            Animal a = map.spawnRandomAnimal();
+            animals.add(a);
+            a.addPosObserver(this);
+            a.addDeathObserver(this);
+            toUpdate.add(a.getPosition());
         }
-//            plants.add(createRandomPlant());
 
-//        for (Plant plant : plants) {
-//            System.out.println(plant.getPosition());
-//        }
-
-        Platform.runLater(() -> {
-            for (Animal a: animals)
-                stage.update(a.getPosition());
-            for (Plant p: plants)
-                stage.update(p.getPosition());
-        });
-    }
-
-    private Plant createRandomPlant()
-    {
-        Vector2d newPosition = map.randomPosition();
-
-        if (this.config.plantGrowingType == SimulationTypes.PlantGrowingType.FORESTYEQUATORS) {
-            boolean preferable = Math.random() <= 0.8;
-            while (map.isPlantAt(newPosition) || map.isAnimalAt(newPosition) || map.isPreferableForPlants(newPosition) != preferable) {
-//            while (map.isPlantAt(newPosition) || map.isPreferableForPlants(newPosition) != preferable) {
-                newPosition = map.randomPosition();
+        plants = new ArrayList<>();
+        for (int i = 0; i < config.plantNumber; i++){
+            Plant p = map.spawnRandomPlant();
+            if (p != null) {
+                plants.add(p);
+                p.addDeathObserver(this);
+                toUpdate.add(p.getPosition());
             }
         }
-        else {
-            while (map.isPlantAt(newPosition))
-                newPosition = map.randomPosition();
-        }
-
-//        System.out.println(plants.size());
-        return new Plant(map,newPosition);
-    }
-
-    private Animal createRandomAnimal() {
-        return new Animal(map, map.randomPosition(),rand,config.animalGenesLength,config.startAnimalEnergy);
     }
 
     @Override
     public void run() {
-        HashSet<Vector2d> toUpdate = new HashSet<>();
         while (true) {
-            toUpdate.clear();
-            for (Animal a : animals) {
-                toUpdate.add(a.getPosition());
-                a.move();
-                toUpdate.add(a.getPosition());
-            }
-
-            for(int i=0; i<config.plantGrowingNumber; i++) {
-                Plant p = createRandomPlant();
-                map.placePlant(p);
-                toUpdate.add(p.getPosition());
-            }
-
             if (stop)
                 return;
+
             Platform.runLater(() -> {
-                for (Vector2d v : toUpdate)
+                ArrayList<Vector2d> updated = new ArrayList<>();
+                for (int i = 0; i<toUpdate.size(); i++) {
+                    Vector2d v = toUpdate.get(i);
                     stage.update(v);
+                    updated.add(v);
+                }
+                toUpdate.removeAll(updated);
+                //stage.updateBackground();
             });
+
+            for (int i = 0; i<animals.size(); i++)
+                if (animals.get(i).getEnergy() <= 0) {
+                    animals.get(i).die();
+                    i--;
+                }
+
+            for (Animal a : animals)
+                a.move();
+
+            TreeSet<Animal> set = new TreeSet<>((a1, a2) -> {
+                if (a1.equals(a2))
+                    return 0;
+                if (a1.getEnergy() != a2.getEnergy())
+                    return a2.getEnergy() - a1.getEnergy();
+                if (a1.getAge() != a2.getAge())
+                    return a2.getAge() - a1.getAge();
+                if (a1.getChildrenAmount() != a2.getChildrenAmount())
+                    return a2.getChildrenAmount() - a1.getChildrenAmount();
+                return a1.toString().compareTo(a2.toString());
+            });
+
+            for (Animal a : animals)
+            {
+                if (map.isPlantAt(a.getPosition())) {
+                    set.clear();
+                    set.addAll(map.animalsAt(a.getPosition()));
+                    set.first().addEnergy(config.plantEnergy);
+                    map.plantAt(a.getPosition()).die();
+                    toUpdate.add(a.getPosition());
+                }
+            }
+
+            for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++){
+                for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
+                    Vector2d v = new Vector2d(x, y);
+                    if (map.animalsAt(v) != null) {
+                        set.clear();
+                        set.addAll(map.animalsAt(v));
+                    }
+                    set.removeIf(a -> a.getEnergy() < config.fedAnimalEnergy);
+                    if (set.size() >= 2) {
+                        Animal a = set.first();
+                        set.remove(a);
+                        Animal child = map.spawnBredAnimal(a,set.first());
+                        animals.add(child);
+                        child.addPosObserver(this);
+                        child.addDeathObserver(this);
+                        //toUpdate.add(v);
+                        //System.out.println("New animal!");
+                    }
+                }
+            }
+
+            for(int i = 0; i < config.plantGrowingNumber; i++) {
+                Plant p = map.spawnRandomPlant();
+                if (p != null) {
+                    plants.add(p);
+                    p.addDeathObserver(this);
+                    toUpdate.add(p.getPosition());
+                }
+            }
 
             try {
                 Thread.sleep(config.moveDelay);
@@ -111,5 +137,20 @@ public class SimulationEngine implements Runnable{
                 stop = true;
             }
         }
+    }
+
+    public void died(Animal a) {
+        animals.remove(a);
+        toUpdate.add(a.getPosition());
+    }
+
+    public void died(Plant p) {
+        plants.remove(p);
+        toUpdate.add(p.getPosition());
+    }
+
+    public void positionChanged(Animal a, Vector2d oldPosition) {
+        toUpdate.add(oldPosition);
+        toUpdate.add(a.getPosition());
     }
 }

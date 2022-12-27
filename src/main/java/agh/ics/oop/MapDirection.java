@@ -27,7 +27,6 @@ public enum MapDirection {
 
     public MapDirection rotate(MoveDirection direction) {
         int rotation = direction.numberOfTurns;
-
         return MapDirection.values()[
                 (this.ordinal() + rotation) % 8];
     }

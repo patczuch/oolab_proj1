@@ -3,7 +3,10 @@ package agh.ics.oop.gui;
 import agh.ics.oop.*;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -12,6 +15,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -20,23 +25,27 @@ public class SimulationStage extends Stage {
     public final double cellSize;
     ImageDictionary imageDictionary;
     AbstractWorldMap map;
-    Random random;
     private final HashMap<Vector2d, ImageView> objects;
-    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, int seed)
+    private final HashMap<Vector2d, Rectangle> background;
+
+    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, Random rand)
     {
         super();
         this.imageDictionary = imageDictionary;
         objects = new HashMap<>();
+        background = new HashMap<>();
         gridPane = new GridPane();
-        random = new Random(seed);
-        SimulationEngine engine = new SimulationEngine(config,random,this);
+        SimulationEngine engine = new SimulationEngine(config,rand,this);
         map = engine.map;
         Thread simulationThread = new Thread(engine);
         setTitle("Symulacja");
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         cellSize = Math.min(screenBounds.getWidth()/config.mapWidth*0.9,screenBounds.getHeight()/config.mapHeight*0.9);
         createBackground();
-        setScene(new Scene(gridPane, config.mapWidth*cellSize, config.mapHeight*cellSize));
+        BorderPane pane = new BorderPane();
+        //pane.setLeft(new Label("TODO Controls"));
+        pane.setCenter(gridPane);
+        setScene(new Scene(pane, config.mapWidth*cellSize, config.mapHeight*cellSize));
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
         show();
@@ -49,18 +58,13 @@ public class SimulationStage extends Stage {
             gridPane.getRowConstraints().add(new RowConstraints(cellSize));
         for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++)
             gridPane.getColumnConstraints().add(new ColumnConstraints(cellSize));
-
-        for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++) {
+        for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++)
             for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
-                Rectangle r = new Rectangle(cellSize+1, cellSize+1);
-
-                if (map.isPreferableForPlants( new Vector2d(x, y).add(map.getLowerLeft()) ))
-                    r.setFill(Color.DARKGREEN);
-                else
-                    r.setFill(Color.GREEN);
+                Rectangle r = new Rectangle(cellSize, cellSize);
+                background.put(new Vector2d(x,y),r);
                 gridPane.add(r, x, map.getUpperRight().subtract(map.getLowerLeft()).y - y);
             }
-        }
+        updateBackground();
     }
 
     public void update(Vector2d pos)
@@ -78,8 +82,17 @@ public class SimulationStage extends Stage {
             ImageView imgV = new ImageView(imageDictionary.getImage(el.getTexturePath()));
             imgV.setFitWidth(cellSize);
             imgV.setFitHeight(cellSize);
+            imgV.setEffect(el.getColorAdjust());
             gridPane.add(imgV, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
             objects.put(pos, imgV);
         }
+    }
+
+    public void updateBackground()
+    {
+        for (Vector2d v: map.getPreferredFields())
+            background.get(v).setFill(Color.DARKGREEN);
+        for (Vector2d v: map.getNotPreferredFields())
+            background.get(v).setFill(Color.GREEN);
     }
 }
