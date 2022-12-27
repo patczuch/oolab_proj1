@@ -3,13 +3,11 @@ package agh.ics.oop.gui;
 import agh.ics.oop.*;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
@@ -27,6 +25,7 @@ public class SimulationStage extends Stage {
     AbstractWorldMap map;
     private final HashMap<Vector2d, ImageView> objects;
     private final HashMap<Vector2d, Rectangle> background;
+    private SimulationControls controls;
 
     SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, Random rand)
     {
@@ -37,15 +36,18 @@ public class SimulationStage extends Stage {
         gridPane = new GridPane();
         SimulationEngine engine = new SimulationEngine(config,rand,this);
         map = engine.map;
+        controls = new SimulationControls(300, engine);
         Thread simulationThread = new Thread(engine);
         setTitle("Symulacja");
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         cellSize = Math.min(screenBounds.getWidth()/config.mapWidth*0.9,screenBounds.getHeight()/config.mapHeight*0.9);
         createBackground();
+
         BorderPane pane = new BorderPane();
-        //pane.setLeft(new Label("TODO Controls"));
+        pane.setLeft(controls.getPane());
         pane.setCenter(gridPane);
-        setScene(new Scene(pane, config.mapWidth*cellSize, config.mapHeight*cellSize));
+
+        setScene(new Scene(pane, config.mapWidth*cellSize + controls.getWidth(), config.mapHeight*cellSize));
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
         show();
@@ -85,6 +87,13 @@ public class SimulationStage extends Stage {
             imgV.setEffect(el.getColorAdjust());
             gridPane.add(imgV, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
             objects.put(pos, imgV);
+
+            if (el instanceof Animal) {
+                final Animal animal = (Animal) el;
+                imgV.setOnMouseClicked(e -> {
+                    controls.setFollowedAnimal(animal);
+                });
+            }
         }
     }
 
@@ -94,5 +103,7 @@ public class SimulationStage extends Stage {
             background.get(v).setFill(Color.DARKGREEN);
         for (Vector2d v: map.getNotPreferredFields())
             background.get(v).setFill(Color.GREEN);
+
+        controls.updateInfo();
     }
 }

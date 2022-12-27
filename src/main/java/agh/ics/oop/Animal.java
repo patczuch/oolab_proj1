@@ -18,8 +18,10 @@ public class Animal implements IMapElement{
     private int currMove;
     private int energy;
     private int age;
+    private int consumed = 0;
     private int childrenAmount;
     private SimulationConfig config;
+    private boolean alive = true;
 
     public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, Random rand, SimulationConfig config, int startEnergy)
     {
@@ -43,6 +45,12 @@ public class Animal implements IMapElement{
         age = 0;
         childrenAmount = 0;
         map.placeAnimal(this);
+
+        for (MoveDirection move : moves) {
+            System.out.print(move);
+            System.out.print(" ");
+        }
+        System.out.println("");
     }
 
     public void rotate(MoveDirection direction)
@@ -51,7 +59,8 @@ public class Animal implements IMapElement{
     }
 
     public void addEnergy(int e) {
-        energy+=e;
+        energy += e;
+        consumed++;
     }
 
     public void takeEnergy(int e) {
@@ -75,11 +84,17 @@ public class Animal implements IMapElement{
 
     public void move() {
         moveInDir(moves[currMove]);
-        currMove++;
-        if (currMove >= moves.length)
-            currMove = 0;
+        currMove = (currMove + 1) % moves.length;
         if (config.animalBehaviourType == SimulationTypes.AnimalBehaviourType.SLIGHTLYCRAZY && rand.nextFloat() >= 0.8)
             currMove = rand.nextInt(config.animalGenesLength);
+    }
+
+    public MoveDirection getCurrentMove() {
+        return moves[currMove];
+    }
+
+    public int getPlantsEaten() {
+        return consumed;
     }
 
     public void setPosition(Vector2d pos) {
@@ -138,6 +153,7 @@ public class Animal implements IMapElement{
     }
     public void die()
     {
+        alive = false;
         for (IDeathObserver observer : deathObservers)
             observer.died(this);
     }
@@ -163,5 +179,9 @@ public class Animal implements IMapElement{
         colorAdjust.setBrightness(0);
         colorAdjust.setSaturation(1);
         return colorAdjust;
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
 }

@@ -16,6 +16,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     private final SimulationConfig config;
     private final SimulationStage stage;
     private boolean stop = false;
+    private boolean paused = true;
     private final ArrayList<Vector2d> toUpdate;
     Random rand;
     public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
@@ -65,7 +66,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     updated.add(v);
                 }
                 toUpdate.removeAll(updated);
-                //stage.updateBackground();
+                stage.updateBackground();
             });
 
             for (int i = 0; i<animals.size(); i++)
@@ -130,7 +131,10 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 }
             }
 
+
             try {
+                while (paused)
+                    Thread.sleep(500);
                 Thread.sleep(config.moveDelay);
             } catch (InterruptedException e) {
                 System.out.println("Simulation interrupted");
@@ -153,4 +157,11 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         toUpdate.add(oldPosition);
         toUpdate.add(a.getPosition());
     }
+
+    public void flipPaused() {
+        this.paused = !this.paused;
+    }
+//    public void unpause() {
+//        this.paused = false;
+//    }
 }
