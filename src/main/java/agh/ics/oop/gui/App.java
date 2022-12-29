@@ -97,9 +97,16 @@ public class App extends Application {
         HBox configsHBox = new HBox(configsInput,saveConfigButtonHbox);
         configsHBox.setPadding(new Insets(20,20,0,20));
 
-        Scene scene = new Scene(new VBox(configsHBox,simulationConfigInput,/*new HBox(new Label("Seed:"),seedInput,new Label("Losowy:"),randomSeed),*/startButtonVBox),800,800);
-        startButton.setOnAction(e ->
-        {
+        CheckBox saveStats = new CheckBox("Zapisuj statystyki do pliku .csv");
+        saveStats.setPadding(new Insets(0,20,10,20));
+
+//        Scene scene = new Scene(new VBox(configsHBox,simulationConfigInput,new HBox(new Label("Seed:"),seedInput,new Label("Losowy:"),randomSeed),startButtonVBox),800,800);
+        Scene scene = new Scene(new VBox(
+                configsHBox, simulationConfigInput,
+                new HBox(saveStats),
+                startButtonVBox), 800,800);
+
+        startButton.setOnAction(e -> {
             if (simulationConfigInput.getSimulationConfig().minAnimalMutationsNumber > simulationConfigInput.getSimulationConfig().maxAnimalMutationsNumber) {
                 new Alert(Alert.AlertType.WARNING, "Minimalna liczba mutacji musi być mniejsza lub równa maksymalnej!").showAndWait();
                 return;
@@ -111,7 +118,7 @@ public class App extends Application {
                 seed = seedInput.getValue();
             System.out.println(seed);*/
             seed = new Random().nextInt();
-            new SimulationStage(simulationConfigInput.getSimulationConfig(), imageDictionary, new Random(seed));
+            new SimulationStage(simulationConfigInput.getSimulationConfig(), imageDictionary, new Random(seed), saveStats.isSelected());
         });
         primaryStage.setTitle("Konfiguracja symulacji");
         primaryStage.setScene(scene);

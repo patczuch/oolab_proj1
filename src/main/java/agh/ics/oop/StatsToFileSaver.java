@@ -36,7 +36,7 @@ public class StatsToFileSaver {
     void appendStats() throws IOException {
         writeToFile(
                 "" + engine.getCurrentDay() + ',' +
-                engine.getLivingAnimalNumber() + ',' + + ',' +
+                engine.getLivingAnimalNumber() + ',' +
                 engine.getPlantNumber() + ',' +
                 engine.map.countFreeFields() + ',' +
                 engine.getMostPopularGenes() + ',' +

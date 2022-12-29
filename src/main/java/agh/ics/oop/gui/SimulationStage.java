@@ -25,7 +25,7 @@ public class SimulationStage extends Stage {
     private final HashMap<Vector2d, Rectangle> background;
     private SimulationControls controls;
 
-    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, Random rand)
+    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, Random rand, boolean saveStats)
     {
         super();
         this.imageDictionary = imageDictionary;
@@ -34,7 +34,7 @@ public class SimulationStage extends Stage {
         gridPane = new GridPane();
         gridPane.setSnapToPixel(false);
         gridPane.setStyle("-fx-background-color: GREEN;");
-        SimulationEngine engine = new SimulationEngine(config,rand,this);
+        SimulationEngine engine = new SimulationEngine(config,rand,this, saveStats);
         map = engine.map;
         controls = new SimulationControls(300, engine);
         Thread simulationThread = new Thread(engine);

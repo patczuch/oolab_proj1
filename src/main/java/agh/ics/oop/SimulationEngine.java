@@ -29,7 +29,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     StatsToFileSaver statsSaver;
     Random rand;
 
-    public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
+    public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage, boolean saveStats)
     {
         toUpdate = new ArrayList<>();
         this.config = config;
@@ -61,12 +61,13 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 toUpdate.add(p.getPosition());
             }
         }
-
-        try {
-            statsSaver = new StatsToFileSaver(this);
-        } catch (IOException e) {
-            System.out.println("An error occurred while working with files. " +
-                    "\nThe simulation statistics will not be saved!");
+        if (saveStats) {
+            try {
+                statsSaver = new StatsToFileSaver(this);
+            } catch (IOException e) {
+                System.out.println("An error occurred while working with files. " +
+                        "\nThe simulation statistics will not be saved!");
+            }
         }
     }
 
@@ -148,11 +149,13 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 }
             }
 
-            try {
-                statsSaver.appendStats();
-            } catch (IOException e) {
-                System.out.println("An error occurred while working with files. " +
-                        "\nThe simulation statistics will not be saved any further!");
+            if (statsSaver != null) {
+                try {
+                    statsSaver.appendStats();
+                } catch (IOException e) {
+                    System.out.println("An error occurred while working with files. " +
+                            "\nThe simulation statistics will not be saved any further!");
+                }
             }
 
             try {
