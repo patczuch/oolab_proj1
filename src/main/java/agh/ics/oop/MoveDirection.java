@@ -43,4 +43,17 @@ public enum MoveDirection {
             return MoveDirection.values()[MoveDirection.values().length-1];
         return MoveDirection.values()[this.ordinal()-1];
     }
+
+    public char humanReadable() {
+        return switch (this) {
+            case FORWARD -> '↑';
+            case FORWARDRIGHT -> '↗';
+            case RIGHT -> '→';
+            case BACKWARDRIGHT -> '↘';
+            case BACKWARD -> '↓';
+            case BACKWARDLEFT -> '↙';
+            case LEFT -> '←';
+            case FORWARDLEFT -> '↖';
+        };
+    }
 }

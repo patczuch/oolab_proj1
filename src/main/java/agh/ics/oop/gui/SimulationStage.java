@@ -4,8 +4,7 @@ import agh.ics.oop.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -13,7 +12,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -23,10 +21,11 @@ public class SimulationStage extends Stage {
     public final double cellSize;
     ImageDictionary imageDictionary;
     AbstractWorldMap map;
-    private final HashMap<Vector2d, ImageView> objects;
+    private final HashMap<Vector2d, VBox> objects;
     private final HashMap<Vector2d, Rectangle> background;
+    private SimulationControls controls;
 
-    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, Random rand)
+    SimulationStage(SimulationConfig config, ImageDictionary imageDictionary, Random rand, boolean saveStats)
     {
         super();
         this.imageDictionary = imageDictionary;
@@ -35,24 +34,20 @@ public class SimulationStage extends Stage {
         gridPane = new GridPane();
         gridPane.setSnapToPixel(false);
         gridPane.setStyle("-fx-background-color: GREEN;");
-        SimulationEngine engine = new SimulationEngine(config,rand,this);
+        SimulationEngine engine = new SimulationEngine(config,rand,this, saveStats);
         map = engine.map;
+        controls = new SimulationControls(300, engine);
         Thread simulationThread = new Thread(engine);
         setTitle("Symulacja");
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         cellSize = (int)Math.min((screenBounds.getWidth()/config.mapWidth)*0.9,(screenBounds.getHeight()/config.mapHeight)*0.9);
         createBackground();
 
-
-        VBox controls = new VBox();
-        controls.setMinWidth(100);
-        controls.setMaxWidth(100);
-        controls.setPrefWidth(100);
-
         BorderPane pane = new BorderPane();
-        //pane.setLeft(controls);
+        pane.setLeft(controls.getPane());
         pane.setCenter(gridPane);
-        setScene(new Scene(pane, config.mapWidth*cellSize/* + controls.getWidth()*/, config.mapHeight*cellSize));
+
+        setScene(new Scene(pane, config.mapWidth*cellSize + controls.getWidth(), config.mapHeight*cellSize));
 
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
@@ -95,8 +90,21 @@ public class SimulationStage extends Stage {
             imgV.setFitWidth(cellSize);
             imgV.setFitHeight(cellSize);
             imgV.setEffect(el.getColorAdjust());
-            gridPane.add(imgV, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
-            objects.put(pos, imgV);
+
+            VBox box = new VBox(imgV);
+            // Black background for a followed animal
+            if (el == controls.getFollowedAnimal())
+                box.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+
+            gridPane.add(box, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
+            objects.put(pos, box);
+
+            if (el instanceof Animal) {
+                final Animal animal = (Animal) el;
+                box.setOnMouseClicked(e -> {
+                    controls.setFollowedAnimal(animal, this);
+                });
+            }
         }
     }
 
@@ -108,5 +116,8 @@ public class SimulationStage extends Stage {
         ArrayList<Vector2d> temp2 = map.getNotPreferredFields();
         for (int i = 0; i < temp2.size(); i++)
             background.get(temp2.get(i)).setFill(Color.GREEN);
+
+        controls.updateStats();
+        controls.updateInfo();
     }
 }

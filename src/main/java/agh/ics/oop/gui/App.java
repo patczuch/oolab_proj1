@@ -2,8 +2,6 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -19,13 +17,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -52,32 +48,6 @@ public class App extends Application {
                 new NumberConstraint(0,Integer.MAX_VALUE),
                 new NumberConstraint(1,Integer.MAX_VALUE),
                 new NumberConstraint(1,Integer.MAX_VALUE));
-
-        /*
-        try {
-            File f = new File("./configurations/1.json");
-            f.getParentFile().mkdirs();
-            FileWriter file = new FileWriter(f);
-            file.write(simulationConfig.toJsonObject("configuration 1").toJSONString());
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        JSONParser parser = new JSONParser();
-        try (Reader reader = new FileReader("./configurations/1.json")) {
-            JSONObject jsonObject = (JSONObject) parser.parse(reader);
-            new SimulationConfig(jsonObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*/
-
-
-        /*NumberField seedInput = new NumberField();
-        CheckBox randomSeed = new CheckBox();
-        randomSeed.setSelected(true);*/
 
         this.configs = FXCollections.observableArrayList(new ArrayList<>());
         configsInput = new ComboBox<>(configs);
@@ -127,9 +97,16 @@ public class App extends Application {
         HBox configsHBox = new HBox(configsInput,saveConfigButtonHbox);
         configsHBox.setPadding(new Insets(20,20,0,20));
 
-        Scene scene = new Scene(new VBox(configsHBox,simulationConfigInput,/*new HBox(new Label("Seed:"),seedInput,new Label("Losowy:"),randomSeed),*/startButtonVBox),800,800);
-        startButton.setOnAction(e ->
-        {
+        CheckBox saveStats = new CheckBox("Zapisuj statystyki do pliku .csv");
+        saveStats.setPadding(new Insets(0,20,10,20));
+
+//        Scene scene = new Scene(new VBox(configsHBox,simulationConfigInput,new HBox(new Label("Seed:"),seedInput,new Label("Losowy:"),randomSeed),startButtonVBox),800,800);
+        Scene scene = new Scene(new VBox(
+                configsHBox, simulationConfigInput,
+                new HBox(saveStats),
+                startButtonVBox), 800,800);
+
+        startButton.setOnAction(e -> {
             if (simulationConfigInput.getSimulationConfig().minAnimalMutationsNumber > simulationConfigInput.getSimulationConfig().maxAnimalMutationsNumber) {
                 new Alert(Alert.AlertType.WARNING, "Minimalna liczba mutacji musi być mniejsza lub równa maksymalnej!").showAndWait();
                 return;
@@ -141,7 +118,7 @@ public class App extends Application {
                 seed = seedInput.getValue();
             System.out.println(seed);*/
             seed = new Random().nextInt();
-            new SimulationStage(simulationConfigInput.getSimulationConfig(), imageDictionary, new Random(seed));
+            new SimulationStage(simulationConfigInput.getSimulationConfig(), imageDictionary, new Random(seed), saveStats.isSelected());
         });
         primaryStage.setTitle("Konfiguracja symulacji");
         primaryStage.setScene(scene);

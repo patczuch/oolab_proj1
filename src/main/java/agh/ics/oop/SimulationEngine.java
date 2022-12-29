@@ -4,6 +4,7 @@ import agh.ics.oop.gui.App;
 import agh.ics.oop.gui.SimulationStage;
 import javafx.application.Platform;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -11,32 +12,43 @@ import java.lang.Thread;
 
 public class SimulationEngine implements Runnable, IPositionChangeObserver, IDeathObserver{
     public final AbstractWorldMap map;
+    // Only alive animals are stored
     private final ArrayList<Animal> animals;
     private final ArrayList<Plant> plants;
     private final SimulationConfig config;
     private final SimulationStage stage;
     private boolean stop = false;
+    private boolean paused = true;
     private final ArrayList<Vector2d> toUpdate;
+    private int currentDay = 0;
+    private int totalAnimalCounter = 0; // Including the dead ones
+    private final HashMap<MoveDirection, Integer> genesPopularity = new HashMap<>();
+    private ArrayList<GeneHolder> mostPopularGenes;
+    public AverageCalculator averageLifeSpan = new AverageCalculator();
+    public AverageCalculator averageEnergyLevel = new AverageCalculator();
+    StatsToFileSaver statsSaver;
     Random rand;
-    public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
+
+    public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage, boolean saveStats)
     {
         toUpdate = new ArrayList<>();
         this.config = config;
         switch(config.mapType)
         {
-            case EARTH -> this.map = new Earth(config,rand);
+//            case EARTH -> this.map = new Earth(config,rand);
             case HELLPORTAL -> this.map = new HellPortal(config,rand);
             default -> this.map = new Earth(config,rand);
         }
         this.stage = stage;
         this.rand = rand;
 
+        for (MoveDirection dir : MoveDirection.values())
+            genesPopularity.put(dir, 0);
+
         animals = new ArrayList<>();
         for (int i = 0; i < config.startAnimalNumber; i++) {
             Animal a = map.spawnRandomAnimal();
-            animals.add(a);
-            a.addPosObserver(this);
-            a.addDeathObserver(this);
+            placeAnimal(a);
             toUpdate.add(a.getPosition());
         }
 
@@ -49,6 +61,14 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 toUpdate.add(p.getPosition());
             }
         }
+        if (saveStats) {
+            try {
+                statsSaver = new StatsToFileSaver(this);
+            } catch (IOException e) {
+                System.out.println("An error occurred while working with files. " +
+                        "\nThe simulation statistics will not be saved!");
+            }
+        }
     }
 
     @Override
@@ -56,6 +76,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         while (true) {
             if (stop)
                 return;
+            currentDay++;
 
             Platform.runLater(() -> {
                 ArrayList<Vector2d> updated = new ArrayList<>();
@@ -89,6 +110,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 return a1.toString().compareTo(a2.toString());
             });
 
+            averageEnergyLevel.clear();
             for (Animal a : animals)
             {
                 if (map.isPlantAt(a.getPosition())) {
@@ -98,6 +120,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     map.plantAt(a.getPosition()).die();
                     toUpdate.add(a.getPosition());
                 }
+                averageEnergyLevel.add(a.getEnergy());
             }
 
             for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++){
@@ -112,11 +135,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                         Animal a = set.first();
                         set.remove(a);
                         Animal child = map.spawnBredAnimal(a,set.first());
-                        animals.add(child);
-                        child.addPosObserver(this);
-                        child.addDeathObserver(this);
-                        //toUpdate.add(v);
-                        //System.out.println("New animal!");
+                        placeAnimal(child);
                     }
                 }
             }
@@ -130,7 +149,18 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 }
             }
 
+            if (statsSaver != null) {
+                try {
+                    statsSaver.appendStats();
+                } catch (IOException e) {
+                    System.out.println("An error occurred while working with files. " +
+                            "\nThe simulation statistics will not be saved any further!");
+                }
+            }
+
             try {
+                while (paused)
+                    Thread.sleep(500);
                 Thread.sleep(config.moveDelay);
             } catch (InterruptedException e) {
                 System.out.println("Simulation interrupted");
@@ -139,9 +169,26 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         }
     }
 
+    public void placeAnimal(Animal animal) {
+        animals.add(animal);
+        animal.addPosObserver(this);
+        animal.addDeathObserver(this);
+
+        totalAnimalCounter++;
+        for (MoveDirection gene : animal.moves)
+            genesPopularity.put(gene, genesPopularity.get(gene) + 1);
+        mostPopularGenes = null;
+    }
+
     public void died(Animal a) {
         animals.remove(a);
         toUpdate.add(a.getPosition());
+
+        averageLifeSpan.add(a.getAge());
+
+        for (MoveDirection gene : a.moves)
+            genesPopularity.put(gene, genesPopularity.get(gene) - 1);
+        mostPopularGenes = null;
     }
 
     public void died(Plant p) {
@@ -152,5 +199,51 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     public void positionChanged(Animal a, Vector2d oldPosition) {
         toUpdate.add(oldPosition);
         toUpdate.add(a.getPosition());
+    }
+
+    public void flipPaused() {
+        this.paused = !this.paused;
+    }
+
+    public int getLivingAnimalNumber() {
+        return animals.size();
+    }
+    public int getAllAnimalNumber() {
+        return totalAnimalCounter;
+    }
+    public int getPlantNumber() {
+        return plants.size();
+    }
+
+    public String getMostPopularGenes(int howMany, boolean humanReadable) {
+        if (mostPopularGenes == null) {
+            mostPopularGenes = new ArrayList<>();
+            for (MoveDirection direction : MoveDirection.values())
+                mostPopularGenes.add(new GeneHolder(direction, genesPopularity.get(direction)));
+            mostPopularGenes.sort(
+                    (GeneHolder g1, GeneHolder g2) -> g2.counter - g1.counter
+            );
+        }
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < howMany; i++) {
+            if (humanReadable)
+                result.append(mostPopularGenes.get(i).gene.humanReadable());
+            else
+                result.append(mostPopularGenes.get(i).gene);
+            result.append(" (").append(mostPopularGenes.get(i).counter).append(")  ");
+        }
+        result.toString().trim();
+
+        return result.toString();
+    }
+    public String getMostPopularGenes(int howMany) {
+        return getMostPopularGenes(howMany, false);
+    }
+    public String getMostPopularGenes() {
+        return getMostPopularGenes(MoveDirection.values().length, false);
+    }
+
+    public int getCurrentDay() {
+        return currentDay;
     }
 }
