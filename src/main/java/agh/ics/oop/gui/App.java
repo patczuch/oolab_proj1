@@ -2,8 +2,6 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -19,13 +17,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -52,32 +48,6 @@ public class App extends Application {
                 new NumberConstraint(0,Integer.MAX_VALUE),
                 new NumberConstraint(1,Integer.MAX_VALUE),
                 new NumberConstraint(1,Integer.MAX_VALUE));
-
-        /*
-        try {
-            File f = new File("./configurations/1.json");
-            f.getParentFile().mkdirs();
-            FileWriter file = new FileWriter(f);
-            file.write(simulationConfig.toJsonObject("configuration 1").toJSONString());
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        JSONParser parser = new JSONParser();
-        try (Reader reader = new FileReader("./configurations/1.json")) {
-            JSONObject jsonObject = (JSONObject) parser.parse(reader);
-            new SimulationConfig(jsonObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*/
-
-
-        /*NumberField seedInput = new NumberField();
-        CheckBox randomSeed = new CheckBox();
-        randomSeed.setSelected(true);*/
 
         this.configs = FXCollections.observableArrayList(new ArrayList<>());
         configsInput = new ComboBox<>(configs);

@@ -24,8 +24,8 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     private int totalAnimalCounter = 0; // Including the dead ones
     private final HashMap<MoveDirection, Integer> genesPopularity = new HashMap<>();
     private ArrayList<GeneHolder> mostPopularGenes;
-    AverageCalculator averageLifeSpan = new AverageCalculator();
-    AverageCalculator averageEnergyLevel = new AverageCalculator();
+    public AverageCalculator averageLifeSpan = new AverageCalculator();
+    public AverageCalculator averageEnergyLevel = new AverageCalculator();
     StatsToFileSaver statsSaver;
     Random rand;
 

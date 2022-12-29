@@ -4,9 +4,7 @@ import agh.ics.oop.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -14,7 +12,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -24,7 +21,7 @@ public class SimulationStage extends Stage {
     public final double cellSize;
     ImageDictionary imageDictionary;
     AbstractWorldMap map;
-    private final HashMap<Vector2d, ImageView> objects;
+    private final HashMap<Vector2d, VBox> objects;
     private final HashMap<Vector2d, Rectangle> background;
     private SimulationControls controls;
 
@@ -50,7 +47,7 @@ public class SimulationStage extends Stage {
         pane.setLeft(controls.getPane());
         pane.setCenter(gridPane);
 
-        setScene(new Scene(pane, config.mapWidth*cellSize/* + controls.getWidth()*/, config.mapHeight*cellSize));
+        setScene(new Scene(pane, config.mapWidth*cellSize + controls.getWidth(), config.mapHeight*cellSize));
 
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
@@ -93,13 +90,19 @@ public class SimulationStage extends Stage {
             imgV.setFitWidth(cellSize);
             imgV.setFitHeight(cellSize);
             imgV.setEffect(el.getColorAdjust());
-            gridPane.add(imgV, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
-            objects.put(pos, imgV);
+
+            VBox box = new VBox(imgV);
+            // Black background for a followed animal
+            if (el == controls.getFollowedAnimal())
+                box.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+
+            gridPane.add(box, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
+            objects.put(pos, box);
 
             if (el instanceof Animal) {
                 final Animal animal = (Animal) el;
-                imgV.setOnMouseClicked(e -> {
-                    controls.setFollowedAnimal(animal);
+                box.setOnMouseClicked(e -> {
+                    controls.setFollowedAnimal(animal, this);
                 });
             }
         }

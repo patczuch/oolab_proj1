@@ -1,5 +1,9 @@
-package agh.ics.oop;
+package agh.ics.oop.gui;
 
+import agh.ics.oop.Animal;
+import agh.ics.oop.MoveDirection;
+import agh.ics.oop.SimulationEngine;
+import agh.ics.oop.Vector2d;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -32,12 +36,20 @@ public class SimulationControls {
         return width;
     }
 
-    public void setFollowedAnimal(Animal animal) {
+    public void setFollowedAnimal(Animal animal, SimulationStage simulationStage) {
+        Vector2d toUpdate = (followedAnimal == null) ? null : followedAnimal.getPosition();
         this.followedAnimal = animal;
-        System.out.print("Following: ");
-        System.out.println(animal.getPosition());
-
         updateInfo();
+
+        if (simulationStage != null) {
+            simulationStage.update(animal.getPosition());
+            if (toUpdate != null)
+                simulationStage.update(toUpdate);
+        }
+    }
+
+    public Animal getFollowedAnimal() {
+        return followedAnimal;
     }
 
     public void updateInfo() {
@@ -74,7 +86,7 @@ public class SimulationControls {
                 "\nLiving animals: " + engine.getLivingAnimalNumber() +
                 "\nPlants on the map: " + engine.getPlantNumber() +
                 "\nFree fields: " + engine.map.countFreeFields() +
-                "\nPopular genes: " + engine.getMostPopularGenes(3, true) +
+                "\nPopular genes: \n" + engine.getMostPopularGenes(3, true) +
                 "\nAverage energy level: " + String.format("%.1f", engine.averageEnergyLevel.getAverage()) +
                 "\nAverage life span: " + String.format("%.1f", engine.averageLifeSpan.getAverage()) +
                 "\nAnimals ever lived: " + engine.getAllAnimalNumber();
