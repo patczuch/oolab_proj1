@@ -17,7 +17,7 @@ public class NumberField extends TextField {
         this(startingValue,new NumberConstraint(Integer.MIN_VALUE,Integer.MAX_VALUE));
     }
     public NumberField(NumberConstraint constraint) {
-        this((constraint.min+constraint.max)/2,constraint);
+        this(constraint.min,constraint);
     }
     public NumberField(int startingValue, NumberConstraint constraint) {
         super(Integer.toString(startingValue));
@@ -45,5 +45,10 @@ public class NumberField extends TextField {
         if (getText().equals("") || getText().equals("-"))
             return defaultValue;
         return Integer.parseInt(getText());
+    }
+
+    public void setNumber(int n)
+    {
+        setText(String.valueOf(n));
     }
 }

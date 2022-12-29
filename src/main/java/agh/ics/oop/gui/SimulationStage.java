@@ -1,6 +1,7 @@
 package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -34,20 +35,23 @@ public class SimulationStage extends Stage {
         objects = new HashMap<>();
         background = new HashMap<>();
         gridPane = new GridPane();
+        gridPane.setSnapToPixel(false);
+        gridPane.setStyle("-fx-background-color: GREEN;");
         SimulationEngine engine = new SimulationEngine(config,rand,this);
         map = engine.map;
         controls = new SimulationControls(300, engine);
         Thread simulationThread = new Thread(engine);
         setTitle("Symulacja");
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
-        cellSize = Math.min(screenBounds.getWidth()/config.mapWidth*0.9,screenBounds.getHeight()/config.mapHeight*0.9);
+        cellSize = (int)Math.min((screenBounds.getWidth()/config.mapWidth)*0.9,(screenBounds.getHeight()/config.mapHeight)*0.9);
         createBackground();
 
         BorderPane pane = new BorderPane();
         pane.setLeft(controls.getPane());
         pane.setCenter(gridPane);
 
-        setScene(new Scene(pane, config.mapWidth*cellSize + controls.getWidth(), config.mapHeight*cellSize));
+        setScene(new Scene(pane, config.mapWidth*cellSize/* + controls.getWidth()*/, config.mapHeight*cellSize));
+
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
         show();
@@ -78,8 +82,12 @@ public class SimulationStage extends Stage {
         IMapElement el = null;
         if (map.isPlantAt(pos))
             el = map.plantAt(pos);
-        if (map.animalsAt(pos) != null && map.animalsAt(pos).size() > 0)
-            el = map.animalsAt(pos).get(map.animalsAt(pos).size()-1);
+        ArrayList<Animal> temp = map.animalsAt(pos);
+        if (temp != null) {
+            int temp_size = temp.size();
+            if (temp_size > 0)
+                el = temp.get(temp_size - 1);
+        }
         if (el != null) {
             ImageView imgV = new ImageView(imageDictionary.getImage(el.getTexturePath()));
             imgV.setFitWidth(cellSize);
@@ -99,10 +107,12 @@ public class SimulationStage extends Stage {
 
     public void updateBackground()
     {
-        for (Vector2d v: map.getPreferredFields())
-            background.get(v).setFill(Color.DARKGREEN);
-        for (Vector2d v: map.getNotPreferredFields())
-            background.get(v).setFill(Color.GREEN);
+        ArrayList<Vector2d> temp = map.getPreferredFields();
+        for (int i = 0; i < temp.size(); i++)
+            background.get(temp.get(i)).setFill(Color.DARKGREEN);
+        ArrayList<Vector2d> temp2 = map.getNotPreferredFields();
+        for (int i = 0; i < temp2.size(); i++)
+            background.get(temp2.get(i)).setFill(Color.GREEN);
 
         controls.updateStats();
         controls.updateInfo();

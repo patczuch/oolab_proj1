@@ -20,6 +20,7 @@ javafx {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
 test {
@@ -27,7 +28,7 @@ test {
 }
 
 application {
-    getMainClass().set('agh.ics.oop.World')
+    getMainClass().set('agh.ics.oop.Main')
 }
 
 java {

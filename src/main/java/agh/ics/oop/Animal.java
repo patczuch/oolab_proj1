@@ -23,10 +23,11 @@ public class Animal implements IMapElement{
     private SimulationConfig config;
     private boolean alive = true;
 
-    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, Random rand, SimulationConfig config, int startEnergy)
+    public Animal(AbstractWorldMap map, Vector2d initialPosition, MoveDirection[] moves, boolean randomFirstMove, Random rand, SimulationConfig config, int startEnergy)
     {
         this(map,initialPosition,moves,MapDirection.getRandom(rand),rand,config);
         this.energy = startEnergy;
+        this.currMove = rand.nextInt(config.animalGenesLength);
     }
     public Animal(AbstractWorldMap map, Vector2d initialPosition, Random rand, SimulationConfig config)
     {
@@ -169,7 +170,7 @@ public class Animal implements IMapElement{
 
     public ColorAdjust getColorAdjust() {
         ColorAdjust colorAdjust = new ColorAdjust();
-        colorAdjust.setHue(0.6 * Math.min((double)energy/config.fedAnimalEnergy,1));
+        colorAdjust.setHue(0.6 * Math.min(Math.max((double)energy/config.fedAnimalEnergy,0),1));
         colorAdjust.setBrightness(0);
         colorAdjust.setSaturation(1);
         return colorAdjust;
