@@ -200,6 +200,18 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         return animalsAt(position) != null && animalsAt(position).size() > 0;
     }
 
+    public int countFreeFields() {
+        int result = 0;
+
+        for (int y = 0; y <= (upperRight.subtract(lowerLeft)).y; y++)
+            for (int x = 0; x < (upperRight.subtract(lowerLeft)).x; x++) {
+                Vector2d pos = new Vector2d(x, y);
+                if (!isAnimalAt(pos) && !isPlantAt(pos))
+                    result++;
+            }
+        return result;
+    }
+
     public Vector2d getLowerLeft() {
         return lowerLeft;
     }

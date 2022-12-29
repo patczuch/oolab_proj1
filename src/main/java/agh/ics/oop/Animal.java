@@ -45,12 +45,6 @@ public class Animal implements IMapElement{
         age = 0;
         childrenAmount = 0;
         map.placeAnimal(this);
-
-        for (MoveDirection move : moves) {
-            System.out.print(move);
-            System.out.print(" ");
-        }
-        System.out.println("");
     }
 
     public void rotate(MoveDirection direction)

@@ -11,6 +11,7 @@ import java.lang.Thread;
 
 public class SimulationEngine implements Runnable, IPositionChangeObserver, IDeathObserver{
     public final AbstractWorldMap map;
+    // Only alive animals are stored
     private final ArrayList<Animal> animals;
     private final ArrayList<Plant> plants;
     private final SimulationConfig config;
@@ -18,26 +19,34 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     private boolean stop = false;
     private boolean paused = true;
     private final ArrayList<Vector2d> toUpdate;
+    private int currentDay = 0;
+    private int totalAnimalCounter = 0; // Including the dead ones
+    private final HashMap<MoveDirection, Integer> genesPopularity = new HashMap<>();
+    private String mostPopularGenes = null;
+    AverageCalculator averageLifeSpan = new AverageCalculator();
+    AverageCalculator averageEnergyLevel = new AverageCalculator();
     Random rand;
+
     public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
     {
         toUpdate = new ArrayList<>();
         this.config = config;
         switch(config.mapType)
         {
-            case EARTH -> this.map = new Earth(config,rand);
+//            case EARTH -> this.map = new Earth(config,rand);
             case HELLPORTAL -> this.map = new HellPortal(config,rand);
             default -> this.map = new Earth(config,rand);
         }
         this.stage = stage;
         this.rand = rand;
 
+        for (MoveDirection dir : MoveDirection.values())
+            genesPopularity.put(dir, 0);
+
         animals = new ArrayList<>();
         for (int i = 0; i < config.startAnimalNumber; i++) {
             Animal a = map.spawnRandomAnimal();
-            animals.add(a);
-            a.addPosObserver(this);
-            a.addDeathObserver(this);
+            placeAnimal(a);
             toUpdate.add(a.getPosition());
         }
 
@@ -57,6 +66,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         while (true) {
             if (stop)
                 return;
+            currentDay++;
 
             Platform.runLater(() -> {
                 ArrayList<Vector2d> updated = new ArrayList<>();
@@ -90,6 +100,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 return a1.toString().compareTo(a2.toString());
             });
 
+            averageEnergyLevel.clear();
             for (Animal a : animals)
             {
                 if (map.isPlantAt(a.getPosition())) {
@@ -99,6 +110,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     map.plantAt(a.getPosition()).die();
                     toUpdate.add(a.getPosition());
                 }
+                averageEnergyLevel.add(a.getEnergy());
             }
 
             for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++){
@@ -113,11 +125,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                         Animal a = set.first();
                         set.remove(a);
                         Animal child = map.spawnBredAnimal(a,set.first());
-                        animals.add(child);
-                        child.addPosObserver(this);
-                        child.addDeathObserver(this);
-                        //toUpdate.add(v);
-                        //System.out.println("New animal!");
+                        placeAnimal(child);
                     }
                 }
             }
@@ -131,7 +139,6 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 }
             }
 
-
             try {
                 while (paused)
                     Thread.sleep(500);
@@ -143,9 +150,26 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         }
     }
 
+    public void placeAnimal(Animal animal) {
+        animals.add(animal);
+        animal.addPosObserver(this);
+        animal.addDeathObserver(this);
+
+        totalAnimalCounter++;
+        for (MoveDirection gene : animal.moves)
+            genesPopularity.put(gene, genesPopularity.get(gene) + 1);
+        mostPopularGenes = null;
+    }
+
     public void died(Animal a) {
         animals.remove(a);
         toUpdate.add(a.getPosition());
+
+        averageLifeSpan.add(a.getAge());
+
+        for (MoveDirection gene : a.moves)
+            genesPopularity.put(gene, genesPopularity.get(gene) - 1);
+        mostPopularGenes = null;
     }
 
     public void died(Plant p) {
@@ -161,7 +185,43 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     public void flipPaused() {
         this.paused = !this.paused;
     }
-//    public void unpause() {
-//        this.paused = false;
-//    }
+
+    public int getLivingAnimalNumber() {
+        return animals.size();
+    }
+    public int getAllAnimalNumber() {
+        return totalAnimalCounter;
+    }
+    public int getPlantNumber() {
+        return plants.size();
+    }
+
+    public String getMostPopularGenes(int howMany) {
+        if (mostPopularGenes == null) {
+            class GeneHolder {
+                MoveDirection gene;
+                int counter;
+                GeneHolder(MoveDirection gene, int counter) {
+                    this.gene = gene;
+                    this.counter = counter;
+                }
+            }
+            ArrayList<GeneHolder> genes = new ArrayList<>();
+            for (MoveDirection direction : MoveDirection.values())
+                genes.add(new GeneHolder(direction, genesPopularity.get(direction)));
+            genes.sort(
+                    (GeneHolder g1, GeneHolder g2) -> g2.counter - g1.counter
+            );
+
+            mostPopularGenes = "";
+            for (int i = 0; i < howMany; i++)
+                mostPopularGenes += genes.get(i).gene.humanReadable() + " (" + genes.get(i).counter + ")  ";
+            mostPopularGenes.trim();
+        }
+        return mostPopularGenes;
+    }
+
+    public int getCurrentDay() {
+        return currentDay;
+    }
 }

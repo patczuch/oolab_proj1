@@ -104,6 +104,7 @@ public class SimulationStage extends Stage {
         for (Vector2d v: map.getNotPreferredFields())
             background.get(v).setFill(Color.GREEN);
 
+        controls.updateStats();
         controls.updateInfo();
     }
 }
