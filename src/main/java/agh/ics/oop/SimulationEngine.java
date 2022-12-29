@@ -4,6 +4,7 @@ import agh.ics.oop.gui.App;
 import agh.ics.oop.gui.SimulationStage;
 import javafx.application.Platform;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -22,9 +23,10 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     private int currentDay = 0;
     private int totalAnimalCounter = 0; // Including the dead ones
     private final HashMap<MoveDirection, Integer> genesPopularity = new HashMap<>();
-    private String mostPopularGenes = null;
+    private ArrayList<GeneHolder> mostPopularGenes;
     AverageCalculator averageLifeSpan = new AverageCalculator();
     AverageCalculator averageEnergyLevel = new AverageCalculator();
+    StatsToFileSaver statsSaver;
     Random rand;
 
     public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage)
@@ -58,6 +60,13 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 p.addDeathObserver(this);
                 toUpdate.add(p.getPosition());
             }
+        }
+
+        try {
+            statsSaver = new StatsToFileSaver(this);
+        } catch (IOException e) {
+            System.out.println("An error occurred while working with files. " +
+                    "\nThe simulation statistics will not be saved!");
         }
     }
 
@@ -140,6 +149,13 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
             }
 
             try {
+                statsSaver.appendStats();
+            } catch (IOException e) {
+                System.out.println("An error occurred while working with files. " +
+                        "\nThe simulation statistics will not be saved any further!");
+            }
+
+            try {
                 while (paused)
                     Thread.sleep(500);
                 Thread.sleep(config.moveDelay);
@@ -196,29 +212,32 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         return plants.size();
     }
 
-    public String getMostPopularGenes(int howMany) {
+    public String getMostPopularGenes(int howMany, boolean humanReadable) {
         if (mostPopularGenes == null) {
-            class GeneHolder {
-                MoveDirection gene;
-                int counter;
-                GeneHolder(MoveDirection gene, int counter) {
-                    this.gene = gene;
-                    this.counter = counter;
-                }
-            }
-            ArrayList<GeneHolder> genes = new ArrayList<>();
+            mostPopularGenes = new ArrayList<>();
             for (MoveDirection direction : MoveDirection.values())
-                genes.add(new GeneHolder(direction, genesPopularity.get(direction)));
-            genes.sort(
+                mostPopularGenes.add(new GeneHolder(direction, genesPopularity.get(direction)));
+            mostPopularGenes.sort(
                     (GeneHolder g1, GeneHolder g2) -> g2.counter - g1.counter
             );
-
-            mostPopularGenes = "";
-            for (int i = 0; i < howMany; i++)
-                mostPopularGenes += genes.get(i).gene.humanReadable() + " (" + genes.get(i).counter + ")  ";
-            mostPopularGenes.trim();
         }
-        return mostPopularGenes;
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < howMany; i++) {
+            if (humanReadable)
+                result.append(mostPopularGenes.get(i).gene.humanReadable());
+            else
+                result.append(mostPopularGenes.get(i).gene);
+            result.append(" (").append(mostPopularGenes.get(i).counter).append(")  ");
+        }
+        result.toString().trim();
+
+        return result.toString();
+    }
+    public String getMostPopularGenes(int howMany) {
+        return getMostPopularGenes(howMany, false);
+    }
+    public String getMostPopularGenes() {
+        return getMostPopularGenes(MoveDirection.values().length, false);
     }
 
     public int getCurrentDay() {

@@ -74,7 +74,7 @@ public class SimulationControls {
                 "\nLiving animals: " + engine.getLivingAnimalNumber() +
                 "\nPlants on the map: " + engine.getPlantNumber() +
                 "\nFree fields: " + engine.map.countFreeFields() +
-                "\nPopular genes: " + engine.getMostPopularGenes(3) +
+                "\nPopular genes: " + engine.getMostPopularGenes(3, true) +
                 "\nAverage energy level: " + String.format("%.1f", engine.averageEnergyLevel.getAverage()) +
                 "\nAverage life span: " + String.format("%.1f", engine.averageLifeSpan.getAverage()) +
                 "\nAnimals ever lived: " + engine.getAllAnimalNumber();
