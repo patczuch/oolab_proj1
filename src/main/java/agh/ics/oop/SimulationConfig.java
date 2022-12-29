@@ -21,10 +21,12 @@ public class SimulationConfig {
     public final int animalGenesLength;
     public final AnimalBehaviourType animalBehaviourType;
     public final int moveDelay;
-    public SimulationConfig(int mapHeight, int mapWidth, MapType mapType, int plantNumber, int plantEnergy, int plantGrowingNumber, PlantGrowingType plantGrowingType,
+    public final String name;
+    public SimulationConfig(String name, int mapHeight, int mapWidth, MapType mapType, int plantNumber, int plantEnergy, int plantGrowingNumber, PlantGrowingType plantGrowingType,
                              int startAnimalNumber, int startAnimalEnergy, int fedAnimalEnergy, int breedingEnergyUsedAnimal, int minAnimalMutationsNumber,
                              int maxAnimalMutationsNumber, AnimalMutationType animalMutationType, int animalGenesLength, AnimalBehaviourType animalBehaviourType, int moveDelay)
     {
+        this.name = name;
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
         this.mapType = mapType;
@@ -44,8 +46,9 @@ public class SimulationConfig {
         this.moveDelay = moveDelay;
     }
 
-    public SimulationConfig(JSONObject jsonObject)
+    public SimulationConfig(String name, JSONObject jsonObject)
     {
+        this.name = name;
         this.mapHeight = (int) (long) jsonObject.get("mapHeight");
         this.mapWidth = (int) (long) jsonObject.get("mapWidth");
         this.mapType = MapType.values()[(int) (long)jsonObject.get("mapType")];
@@ -65,10 +68,9 @@ public class SimulationConfig {
         this.moveDelay = (int) (long) jsonObject.get("moveDelay");
     }
 
-    public JSONObject toJsonObject(String name)
+    public JSONObject toJsonObject()
     {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", name);
         jsonObject.put("mapHeight", mapHeight);
         jsonObject.put("mapWidth", mapWidth);
         jsonObject.put("mapType", mapType.ordinal());
@@ -87,5 +89,10 @@ public class SimulationConfig {
         jsonObject.put("animalBehaviourType", animalBehaviourType.ordinal());
         jsonObject.put("moveDelay", moveDelay);
         return jsonObject;
+    }
+
+    public String toString()
+    {
+        return name;
     }
 }

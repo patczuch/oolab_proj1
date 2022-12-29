@@ -26,45 +26,46 @@ public class SimulationConfigInput extends GridPane {
     NumberField animalGenesLengthInput;
     ComboBox<AnimalBehaviourType> animalBehaviourTypeInput;
     NumberField moveDelayInput;
-    SimulationConfigInput(SimulationConfig simulationConfig, InputValuesConstraints inputValuesConstraints)
+    SimulationConfigInput(SimulationConfig config, InputValuesConstraints inputValuesConstraints)
     {
-        mapHeightInput = new NumberField(simulationConfig.mapHeight,inputValuesConstraints.mapHeightInputConstraint);
-        mapWidthInput = new NumberField(simulationConfig.mapWidth,inputValuesConstraints.mapWidthInputConstraint);
+        this(inputValuesConstraints);
+        setValues(config);
+    }
+    SimulationConfigInput(InputValuesConstraints inputValuesConstraints)
+    {
+        mapHeightInput = new NumberField(inputValuesConstraints.mapHeightInputConstraint);
+        mapWidthInput = new NumberField(inputValuesConstraints.mapWidthInputConstraint);
         mapTypeInput = new ComboBox<>(
                 FXCollections.observableArrayList(
                         MapType.EARTH,
                         MapType.HELLPORTAL
                 ));
-        mapTypeInput.getSelectionModel().select(simulationConfig.mapType);
-        plantNumberInput = new NumberField(simulationConfig.plantNumber,inputValuesConstraints.plantNumberInputConstraint);
-        plantEnergyInput = new NumberField(simulationConfig.plantEnergy,inputValuesConstraints.plantEnergyInputConstraint);
-        plantGrowingNumberInput = new NumberField(simulationConfig.plantGrowingNumber,inputValuesConstraints.plantGrowingNumberInputConstraint);
+        plantNumberInput = new NumberField(inputValuesConstraints.plantNumberInputConstraint);
+        plantEnergyInput = new NumberField(inputValuesConstraints.plantEnergyInputConstraint);
+        plantGrowingNumberInput = new NumberField(inputValuesConstraints.plantGrowingNumberInputConstraint);
         plantGrowingType = new ComboBox<>(
                 FXCollections.observableArrayList(
                         PlantGrowingType.TOXICDEAD,
                         PlantGrowingType.FORESTYEQUATORS
                 ));
-        plantGrowingType.getSelectionModel().select(simulationConfig.plantGrowingType);
-        startAnimalNumberInput = new NumberField(simulationConfig.startAnimalNumber,inputValuesConstraints.startAnimalNumberInputConstraint);
-        startAnimalEnergyInput = new NumberField(simulationConfig.startAnimalEnergy,inputValuesConstraints.startAnimalEnergyInputConstraint);
-        fedAnimalEnergyInput = new NumberField(simulationConfig.fedAnimalEnergy,inputValuesConstraints.fedAnimalEnergyInputConstraint);
-        breedingEnergyUsedAnimalInput = new NumberField(simulationConfig.breedingEnergyUsedAnimal,inputValuesConstraints.breedingEnergyUsedAnimalInputConstraint);
-        minAnimalMutationsNumberInput = new NumberField(simulationConfig.minAnimalMutationsNumber,inputValuesConstraints.minAnimalMutationsNumberInputConstraint);
-        maxAnimalMutationsNumberInput = new NumberField(simulationConfig.maxAnimalMutationsNumber,inputValuesConstraints.maxAnimalMutationsNumberInputConstraint);
+        startAnimalNumberInput = new NumberField(inputValuesConstraints.startAnimalNumberInputConstraint);
+        startAnimalEnergyInput = new NumberField(inputValuesConstraints.startAnimalEnergyInputConstraint);
+        fedAnimalEnergyInput = new NumberField(inputValuesConstraints.fedAnimalEnergyInputConstraint);
+        breedingEnergyUsedAnimalInput = new NumberField(inputValuesConstraints.breedingEnergyUsedAnimalInputConstraint);
+        minAnimalMutationsNumberInput = new NumberField(inputValuesConstraints.minAnimalMutationsNumberInputConstraint);
+        maxAnimalMutationsNumberInput = new NumberField(inputValuesConstraints.maxAnimalMutationsNumberInputConstraint);
         animalMutationTypeInput = new ComboBox<>(
                 FXCollections.observableArrayList(
                         AnimalMutationType.FULLYRANDOM,
                         AnimalMutationType.LESSRANDOM
                 ));
-        animalMutationTypeInput.getSelectionModel().select(simulationConfig.animalMutationType);
-        animalGenesLengthInput = new NumberField(simulationConfig.animalGenesLength,inputValuesConstraints.animalGenesLengthConstraint);
+        animalGenesLengthInput = new NumberField(inputValuesConstraints.animalGenesLengthConstraint);
         animalBehaviourTypeInput = new ComboBox<>(
                 FXCollections.observableArrayList(
                         AnimalBehaviourType.FULLYDETERMINED,
                         AnimalBehaviourType.SLIGHTLYCRAZY
                 ));
-        animalBehaviourTypeInput.getSelectionModel().select(simulationConfig.animalBehaviourType);
-        moveDelayInput = new NumberField(simulationConfig.moveDelay,inputValuesConstraints.moveDelayConstraint);
+        moveDelayInput = new NumberField(inputValuesConstraints.moveDelayConstraint);
         this.add(new Label("Wysokość mapy:"),0,0);
         this.add(mapHeightInput,1,0);
         this.add(new Label("Szerokość mapy:"),0,1);
@@ -105,9 +106,30 @@ public class SimulationConfigInput extends GridPane {
         this.setVgap(5);
     }
 
+    public void setValues(SimulationConfig simulationConfig)
+    {
+        mapHeightInput.setNumber(simulationConfig.mapHeight);
+        mapWidthInput.setNumber(simulationConfig.mapWidth);
+        mapTypeInput.getSelectionModel().select(simulationConfig.mapType);
+        plantNumberInput.setNumber(simulationConfig.plantNumber);
+        plantEnergyInput.setNumber(simulationConfig.plantEnergy);
+        plantGrowingNumberInput.setNumber(simulationConfig.plantGrowingNumber);
+        plantGrowingType.getSelectionModel().select(simulationConfig.plantGrowingType);
+        startAnimalNumberInput.setNumber(simulationConfig.startAnimalNumber);
+        startAnimalEnergyInput.setNumber(simulationConfig.startAnimalEnergy);
+        fedAnimalEnergyInput.setNumber(simulationConfig.fedAnimalEnergy);
+        breedingEnergyUsedAnimalInput.setNumber(simulationConfig.breedingEnergyUsedAnimal);
+        minAnimalMutationsNumberInput.setNumber(simulationConfig.minAnimalMutationsNumber);
+        maxAnimalMutationsNumberInput.setNumber(simulationConfig.maxAnimalMutationsNumber);
+        animalMutationTypeInput.getSelectionModel().select(simulationConfig.animalMutationType);
+        animalGenesLengthInput.setNumber(simulationConfig.animalGenesLength);
+        animalBehaviourTypeInput.getSelectionModel().select(simulationConfig.animalBehaviourType);
+        moveDelayInput.setNumber(simulationConfig.moveDelay);
+    }
+
     public SimulationConfig getSimulationConfig()
     {
-        return new SimulationConfig(mapHeightInput.getValue(),mapWidthInput.getValue(),mapTypeInput.getValue(),plantNumberInput.getValue(),
+        return new SimulationConfig("nowy",mapHeightInput.getValue(),mapWidthInput.getValue(),mapTypeInput.getValue(),plantNumberInput.getValue(),
                 plantEnergyInput.getValue(),plantGrowingNumberInput.getValue(),plantGrowingType.getValue(),startAnimalNumberInput.getValue(),
                 startAnimalEnergyInput.getValue(),fedAnimalEnergyInput.getValue(),breedingEnergyUsedAnimalInput.getValue(),
                 minAnimalMutationsNumberInput.getValue(), maxAnimalMutationsNumberInput.getValue(),

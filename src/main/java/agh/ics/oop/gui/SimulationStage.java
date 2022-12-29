@@ -1,6 +1,7 @@
 package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -32,12 +33,14 @@ public class SimulationStage extends Stage {
         objects = new HashMap<>();
         background = new HashMap<>();
         gridPane = new GridPane();
+        gridPane.setSnapToPixel(false);
+        gridPane.setStyle("-fx-background-color: GREEN;");
         SimulationEngine engine = new SimulationEngine(config,rand,this);
         map = engine.map;
         Thread simulationThread = new Thread(engine);
         setTitle("Symulacja");
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
-        cellSize = Math.min(screenBounds.getWidth()/config.mapWidth*0.9,screenBounds.getHeight()/config.mapHeight*0.9);
+        cellSize = (int)Math.min((screenBounds.getWidth()/config.mapWidth)*0.9,(screenBounds.getHeight()/config.mapHeight)*0.9);
         createBackground();
 
 
