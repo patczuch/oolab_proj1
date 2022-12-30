@@ -10,29 +10,29 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 
-public class SimulationControls {
+public class SimulationControls extends BorderPane{
     private final int width;
     private Animal followedAnimal = null;
-    private final BorderPane pane;
     private final SimulationEngine engine;
 
     public SimulationControls(int width, SimulationEngine engine) {
+        super();
         this.width = width;
         this.engine = engine;
 
-        Button pauseButton = new Button("Pause");
-        pauseButton.setOnAction(e -> {engine.flipPaused();});
+        Button pauseButton = new Button("Zatrzymaj");
+        pauseButton.setOnAction(e -> {engine.togglePaused(); pauseButton.setText(pauseButton.getText().equals("Zatrzymaj") ? "Wznów" : "Zatrzymaj");});
 
-        pane = new BorderPane();
-        pane.setMinWidth(width);
-        pane.setMaxWidth(width);
-        pane.setPrefWidth(width);
-        pane.setPadding(new Insets(40, 20, 40, 20));
 
-        pane.setTop(pauseButton);
+        setMinWidth(width);
+        setMaxWidth(width);
+        setPrefWidth(width);
+        setPadding(new Insets(40, 20, 40, 20));
+
+        setTop(pauseButton);
     }
 
-    public int getWidth() {
+    public int _getWidth() {
         return width;
     }
 
@@ -58,42 +58,42 @@ public class SimulationControls {
             message="\n".repeat(9);
         else {
             message =
-                    "Selected animal" +
-                    "\nGenome: \n" + movesToString(followedAnimal.moves);
+                    "Wybrane zwierzę" +
+                    "\nGenom: \n" + movesToString(followedAnimal.moves);
 
             if (followedAnimal.isAlive())
                 message +=
-                        "\nAge: " + followedAnimal.getAge() +
-                        "\nEnergy: " + followedAnimal.getEnergy() +
-                        "\nPosition: " + followedAnimal.getPosition().toString();
+                        "\nWiek: " + followedAnimal.getAge() +
+                        "\nEnergia: " + followedAnimal.getEnergy() +
+                        "\nPozycja: " + followedAnimal.getPosition().toString();
             else
                 message +=
-                        "\nDied at age: " + followedAnimal.getAge() +
-                        "\nAt position: " + followedAnimal.getPosition().toString()+"\n";
+                        "\nZmarło w wieku: " + followedAnimal.getAge() +
+                        "\nNa pozycji: " + followedAnimal.getPosition().toString()+"\n";
             message +=
-                    "\nCurrent move: " + followedAnimal.getCurrentMove().humanReadable() +
-                    "\nChildren: " + followedAnimal.getChildrenAmount() +
-                    "\nPlants eaten: " + followedAnimal.getPlantsEaten();
+                    "\nAktualny ruch: " + followedAnimal.getCurrentMove().humanReadable() +
+                    "\nDzieci: " + followedAnimal.getChildrenAmount() +
+                    "\nZjedzone rośliny: " + followedAnimal.getPlantsEaten();
         }
         Label newLabel = new Label(message);
         newLabel.setFont(new Font(15));
-        pane.setBottom(newLabel);
+        setBottom(newLabel);
     }
 
     public void updateStats() {
         String message =
-                "Day " + engine.getCurrentDay() +
-                "\nLiving animals: " + engine.getLivingAnimalNumber() +
-                "\nPlants on the map: " + engine.getPlantNumber() +
-                "\nFree fields: " + engine.map.countFreeFields() +
-                "\nPopular genes: \n" + engine.getMostPopularGenes(3, true) +
-                "\nAverage energy level: " + String.format("%.1f", engine.averageEnergyLevel.getAverage()) +
-                "\nAverage life span: " + String.format("%.1f", engine.averageLifeSpan.getAverage()) +
-                "\nAnimals ever lived: " + engine.getAllAnimalNumber();
+                "Dzień " + engine.getCurrentDay() +
+                "\nŻywe zwierzęta: " + engine.getLivingAnimalNumber() +
+                "\nRośliny: " + engine.getPlantNumber() +
+                "\nWolne pola: " + engine.map.countFreeFields() +
+                "\nPopularne geny: \n" + engine.getMostPopularGenes(3, true) +
+                "\nŚredni poziom energii: " + String.format("%.1f", engine.averageEnergyLevel.getAverage()) +
+                "\nŚrednia długość życia: " + String.format("%.1f", engine.averageLifeSpan.getAverage()) +
+                "\nWszystkie zwierzęta: " + engine.getAllAnimalNumber();
 
         Label newLabel = new Label(message);
         newLabel.setFont(new Font(15));
-        pane.setCenter(newLabel);
+        setCenter(newLabel);
 //        pane.setLeft(newLabel);
     }
 
@@ -103,9 +103,5 @@ public class SimulationControls {
             result.append(move.humanReadable());
 
         return result.toString();
-    }
-
-    public BorderPane getPane() {
-        return pane;
     }
 }

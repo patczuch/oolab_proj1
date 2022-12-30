@@ -1,1 +1,1 @@
-This folder consists of saved statistics from a simulation
+Ten folder zawiera statystyki symulacji zapisane do plików

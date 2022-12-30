@@ -44,10 +44,10 @@ public class SimulationStage extends Stage {
         createBackground();
 
         BorderPane pane = new BorderPane();
-        pane.setLeft(controls.getPane());
+        pane.setLeft(controls);
         pane.setCenter(gridPane);
 
-        setScene(new Scene(pane, config.mapWidth*cellSize + controls.getWidth(), config.mapHeight*cellSize));
+        setScene(new Scene(pane, config.mapWidth*cellSize + controls._getWidth(), config.mapHeight*cellSize));
 
         setResizable(false);
         setOnCloseRequest(e -> simulationThread.interrupt());
@@ -99,8 +99,7 @@ public class SimulationStage extends Stage {
             gridPane.add(box, pos.x, map.getUpperRight().subtract(map.getLowerLeft()).y - pos.y);
             objects.put(pos, box);
 
-            if (el instanceof Animal) {
-                final Animal animal = (Animal) el;
+            if (el instanceof final Animal animal) {
                 box.setOnMouseClicked(e -> {
                     controls.setFollowedAnimal(animal, this);
                 });

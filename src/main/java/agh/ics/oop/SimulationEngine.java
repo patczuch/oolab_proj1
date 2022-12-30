@@ -18,7 +18,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     private final SimulationConfig config;
     private final SimulationStage stage;
     private boolean stop = false;
-    private boolean paused = true;
+    private boolean paused = false;
     private final ArrayList<Vector2d> toUpdate;
     private int currentDay = 0;
     private int totalAnimalCounter = 0; // Including the dead ones
@@ -160,7 +160,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
 
             try {
                 while (paused)
-                    Thread.sleep(500);
+                    Thread.sleep(200);
                 Thread.sleep(config.moveDelay);
             } catch (InterruptedException e) {
                 System.out.println("Simulation interrupted");
@@ -201,7 +201,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         toUpdate.add(a.getPosition());
     }
 
-    public void flipPaused() {
+    public void togglePaused() {
         this.paused = !this.paused;
     }
 
@@ -218,18 +218,21 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     public String getMostPopularGenes(int howMany, boolean humanReadable) {
         if (mostPopularGenes == null) {
             mostPopularGenes = new ArrayList<>();
+            ArrayList<GeneHolder> toAdd = new ArrayList<>();
             for (MoveDirection direction : MoveDirection.values())
-                mostPopularGenes.add(new GeneHolder(direction, genesPopularity.get(direction)));
-            mostPopularGenes.sort(
+                toAdd.add(new GeneHolder(direction, genesPopularity.get(direction)));
+            toAdd.sort(
                     (GeneHolder g1, GeneHolder g2) -> g2.counter - g1.counter
             );
+            mostPopularGenes.addAll(toAdd);
         }
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < howMany; i++) {
-            if (humanReadable)
-                result.append(mostPopularGenes.get(i).gene.humanReadable());
-            else
-                result.append(mostPopularGenes.get(i).gene);
+            if (mostPopularGenes != null)
+                if (humanReadable)
+                    result.append(mostPopularGenes.get(i).gene.humanReadable());
+                else
+                    result.append(mostPopularGenes.get(i).gene);
             result.append(" (").append(mostPopularGenes.get(i).counter).append(")  ");
         }
         result.toString().trim();
