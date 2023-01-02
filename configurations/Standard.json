@@ -1,0 +1,19 @@
+{
+  "minAnimalMutationsNumber":5,
+  "fedAnimalEnergy":10,
+  "startAnimalNumber":20,
+  "mapType":0,
+  "animalMutationType":0,
+  "mapHeight":25,
+  "breedingEnergyUsedAnimal":5,
+  "plantGrowingNumber":10,
+  "startAnimalEnergy":50,
+  "plantGrowingType":1,
+  "plantEnergy":10,
+  "mapWidth":25,
+  "animalGenesLength":20,
+  "plantNumber":30,
+  "maxAnimalMutationsNumber":10,
+  "moveDelay":250,
+  "animalBehaviourType":0
+}
