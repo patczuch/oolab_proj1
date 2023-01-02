@@ -9,23 +9,23 @@ import javafx.scene.layout.GridPane;
 
 import agh.ics.oop.SimulationTypes.*;
 public class SimulationConfigInput extends GridPane {
-    NumberField mapHeightInput;
-    NumberField mapWidthInput;
-    ComboBox<MapType> mapTypeInput;
-    NumberField plantNumberInput;
-    NumberField plantEnergyInput;
-    NumberField plantGrowingNumberInput;
-    ComboBox<PlantGrowingType> plantGrowingType;
-    NumberField startAnimalNumberInput;
-    NumberField startAnimalEnergyInput;
-    NumberField fedAnimalEnergyInput;
-    NumberField breedingEnergyUsedAnimalInput;
-    NumberField minAnimalMutationsNumberInput;
-    NumberField maxAnimalMutationsNumberInput;
-    ComboBox<AnimalMutationType> animalMutationTypeInput;
-    NumberField animalGenesLengthInput;
-    ComboBox<AnimalBehaviourType> animalBehaviourTypeInput;
-    NumberField moveDelayInput;
+    private final NumberField mapHeightInput;
+    private final NumberField mapWidthInput;
+    private final ComboBox<MapType> mapTypeInput;
+    private final NumberField plantNumberInput;
+    private final NumberField plantEnergyInput;
+    private final NumberField plantGrowingNumberInput;
+    private final ComboBox<PlantGrowingType> plantGrowingType;
+    private final NumberField startAnimalNumberInput;
+    private final NumberField startAnimalEnergyInput;
+    private final NumberField fedAnimalEnergyInput;
+    private final NumberField breedingEnergyUsedAnimalInput;
+    private final NumberField minAnimalMutationsNumberInput;
+    private final NumberField maxAnimalMutationsNumberInput;
+    private final ComboBox<AnimalMutationType> animalMutationTypeInput;
+    private final NumberField animalGenesLengthInput;
+    private final ComboBox<AnimalBehaviourType> animalBehaviourTypeInput;
+    private final NumberField moveDelayInput;
     SimulationConfigInput(SimulationConfig config, InputValuesConstraints inputValuesConstraints)
     {
         this(inputValuesConstraints);
