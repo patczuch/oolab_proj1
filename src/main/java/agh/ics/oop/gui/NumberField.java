@@ -2,7 +2,6 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.NumberConstraint;
 import javafx.scene.control.TextField;
-
 import java.math.BigInteger;
 
 public class NumberField extends TextField {

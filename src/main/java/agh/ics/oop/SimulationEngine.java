@@ -1,11 +1,9 @@
 package agh.ics.oop;
 
-import agh.ics.oop.gui.App;
 import agh.ics.oop.gui.SimulationStage;
 import javafx.application.Platform;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import java.lang.Thread;
@@ -235,9 +233,8 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     result.append(mostPopularGenes.get(i).gene);
             result.append(" (").append(mostPopularGenes.get(i).counter).append(")  ");
         }
-        result.toString().trim();
 
-        return result.toString();
+        return result.toString().trim();
     }
     public String getMostPopularGenes(int howMany) {
         return getMostPopularGenes(howMany, false);
