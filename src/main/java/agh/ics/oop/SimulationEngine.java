@@ -24,8 +24,8 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     private ArrayList<GeneHolder> mostPopularGenes;
     public AverageCalculator averageLifeSpan = new AverageCalculator();
     public AverageCalculator averageEnergyLevel = new AverageCalculator();
-    StatsToFileSaver statsSaver;
-    Random rand;
+    private StatsToFileSaver statsSaver;
+    private Random rand;
 
     public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage, boolean saveStats)
     {

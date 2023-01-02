@@ -18,8 +18,8 @@ import java.util.Random;
 public class SimulationStage extends Stage {
     private final GridPane gridPane;
     public final double cellSize;
-    ImageDictionary imageDictionary;
-    AbstractWorldMap map;
+    private final ImageDictionary imageDictionary;
+    private final AbstractWorldMap map;
     private final HashMap<Vector2d, VBox> objects;
     private final HashMap<Vector2d, Rectangle> background;
     private SimulationControls controls;
