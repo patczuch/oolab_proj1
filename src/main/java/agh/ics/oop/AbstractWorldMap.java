@@ -1,25 +1,26 @@
-package agh.ics.oop;
+package agh.ics.oop;    // przydałby się podział na pakiety
 
 import java.util.*;
 
-public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeathObserver{
+public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeathObserver {
     private final Vector2d lowerLeft;
     private final Vector2d upperRight;
     private final HashMap<Vector2d, ArrayList<Animal>> animals;
     private final HashMap<Vector2d, Plant> plants;
     protected final SimulationConfig config;
-    private final int[][] plantPreferred;
+    private final int[][] plantPreferred;   // trochę mi się nazwa nie zgadza z typem
     private final LinkedList<ArrayList<Vector2d>> plantPreferredFields;
-    Random rand;
+    Random rand;  // modyfikator dostępu
+
     protected AbstractWorldMap(SimulationConfig config, Random rand) {
         animals = new HashMap<>();
         plants = new HashMap<>();
-        lowerLeft = new Vector2d(0,0);
-        upperRight = new Vector2d(config.mapWidth-1,config.mapHeight-1);
+        lowerLeft = new Vector2d(0, 0);
+        upperRight = new Vector2d(config.mapWidth - 1, config.mapHeight - 1);
         this.rand = rand;
         this.config = config;
 
-        plantPreferred = new int[upperRight.y-lowerLeft.y+1][upperRight.x-lowerLeft.x+1];
+        plantPreferred = new int[upperRight.y - lowerLeft.y + 1][upperRight.x - lowerLeft.x + 1];
         plantPreferredFields = new LinkedList<>();
         plantPreferredFields.add(new ArrayList<>());
         if (config.plantGrowingType == SimulationTypes.PlantGrowingType.FORESTYEQUATORS) {
@@ -29,13 +30,12 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
                 for (int j = 0; j < plantPreferred[i].length; j++) {
                     if (i < (plantPreferred.length - equatorHeight) / 2 || i > (plantPreferred.length + equatorHeight) / 2)
                         plantPreferred[i][j] = 1;
-                    plantPreferredFields.get(plantPreferred[i][j]).add(new Vector2d(j,i));
+                    plantPreferredFields.get(plantPreferred[i][j]).add(new Vector2d(j, i));
                 }
-        }
-        else if (config.plantGrowingType == SimulationTypes.PlantGrowingType.TOXICDEAD) {
+        } else if (config.plantGrowingType == SimulationTypes.PlantGrowingType.TOXICDEAD) {
             for (int i = 0; i < plantPreferred.length; i++)
                 for (int j = 0; j < plantPreferred[i].length; j++)
-                    plantPreferredFields.get(0).add(new Vector2d(j,i));
+                    plantPreferredFields.get(0).add(new Vector2d(j, i));
         }
 
         /*for(int i = 0; i<plantPreferred.length; i++) {
@@ -57,37 +57,33 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         a.addDeathObserver(this);
     }
 
-    public ArrayList<Vector2d> getPreferredFields()
-    {
+    public ArrayList<Vector2d> getPreferredFields() {
         for (ArrayList<Vector2d> a : plantPreferredFields)
             if (a.size() > 0)
                 return a;
         return new ArrayList<>();
     }
 
-    public ArrayList<Vector2d> getNotPreferredFields()
-    {
+    public ArrayList<Vector2d> getNotPreferredFields() {
         ArrayList<Vector2d> notPreferredFields = new ArrayList<>();
         for (int y = 0; y <= getUpperRight().subtract(getLowerLeft()).y; y++)
             for (int x = 0; x <= getUpperRight().subtract(getLowerLeft()).x; x++)
-                notPreferredFields.add(new Vector2d(x,y));
+                notPreferredFields.add(new Vector2d(x, y));
         notPreferredFields.removeAll(getPreferredFields());
         return notPreferredFields;
     }
 
-    public Plant spawnRandomPlant()
-    {
+    public Plant spawnRandomPlant() {
         boolean inPreferredField = rand.nextFloat() <= 0.8;
         //boolean inPreferredField = true;
 
         int firstPossibleIndex = -1;
         int secondPossibleIndex = -1;
-        for (int i = 0; i<plantPreferredFields.size();i++)
+        for (int i = 0; i < plantPreferredFields.size(); i++)
             if (plantPreferredFields.get(i).size() > 0)
                 if (firstPossibleIndex == -1)
                     firstPossibleIndex = i;
-                else
-                {
+                else {
                     secondPossibleIndex = i;
                     break;
                 }
@@ -108,24 +104,21 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         Vector2d pos = plantPreferredFields.get(index).get(rand.nextInt(plantPreferredFields.get(index).size()));
         plantPreferredFields.get(index).remove(pos);
 
-        return new Plant(this,pos);
+        return new Plant(this, pos);
     }
 
     public Animal spawnRandomAnimal() {
-        return new Animal(this, randomPosition(),rand,config);
+        return new Animal(this, randomPosition(), rand, config);
     }
 
-    public Animal spawnBredAnimal(Animal _a1, Animal _a2) {
+    public Animal spawnBredAnimal(Animal _a1, Animal _a2) {  // co to za podkreślniki?
         Animal a1;
         Animal a2;
 
-        if (_a1.getEnergy() > _a2.getEnergy())
-        {
+        if (_a1.getEnergy() > _a2.getEnergy()) {
             a1 = _a1;
             a2 = _a2;
-        }
-        else
-        {
+        } else {
             a1 = _a2;
             a2 = _a1;
         }
@@ -138,14 +131,14 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         boolean side = rand.nextBoolean();
         MoveDirection[] moves = new MoveDirection[config.animalGenesLength];
         if (side)
-            for(int i = 0; i<config.animalGenesLength; i++)
-                if (i < ((double) a1.getEnergy()/(a1.getEnergy()+a2.getEnergy()))*config.animalGenesLength)
+            for (int i = 0; i < config.animalGenesLength; i++)
+                if (i < ((double) a1.getEnergy() / (a1.getEnergy() + a2.getEnergy())) * config.animalGenesLength)  // https://docs.oracle.com/javase/7/docs/api/java/lang/System.html#arraycopy(java.lang.Object,%20int,%20java.lang.Object,%20int,%20int)
                     moves[i] = a1.moves[i];
                 else
                     moves[i] = a2.moves[i];
         else
-            for(int i = config.animalGenesLength-1; i>=0; i--)
-                if (i >= config.animalGenesLength - ((double)a1.getEnergy()/(a1.getEnergy()+a2.getEnergy())) * config.animalGenesLength)
+            for (int i = config.animalGenesLength - 1; i >= 0; i--)
+                if (i >= config.animalGenesLength - ((double) a1.getEnergy() / (a1.getEnergy() + a2.getEnergy())) * config.animalGenesLength)
                     moves[i] = a1.moves[i];
                 else
                     moves[i] = a2.moves[i];
@@ -154,48 +147,49 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         for (int i = 0; i < config.animalGenesLength; i++)
             indices.add(i);
         Collections.shuffle(indices);
-        indices = indices.subList(0,config.minAnimalMutationsNumber + rand.nextInt(1 + config.maxAnimalMutationsNumber - config.minAnimalMutationsNumber));
+        indices = indices.subList(0, config.minAnimalMutationsNumber + rand.nextInt(1 + config.maxAnimalMutationsNumber - config.minAnimalMutationsNumber));
 
-        if(config.animalMutationType == SimulationTypes.AnimalMutationType.FULLYRANDOM)
-            for(int i : indices)
+        if (config.animalMutationType == SimulationTypes.AnimalMutationType.FULLYRANDOM)
+            for (int i : indices)
                 moves[i] = MoveDirection.random(rand);
 
-        if(config.animalMutationType == SimulationTypes.AnimalMutationType.LESSRANDOM)
-            for(int i : indices)
+        if (config.animalMutationType == SimulationTypes.AnimalMutationType.LESSRANDOM)
+            for (int i : indices)
                 moves[i] = rand.nextBoolean() ? moves[i].previous() : moves[i].next();
 
-        return new Animal(this,a1.getPosition(),moves,true,rand,config,config.breedingEnergyUsedAnimal*2);
+        return new Animal(this, a1.getPosition(), moves, true, rand, config, config.breedingEnergyUsedAnimal * 2);
     }
 
     public void placePlant(Plant p) {
-        plants.put(p.getPosition(),p);
+        plants.put(p.getPosition(), p);
         p.addDeathObserver(this);
     }
 
-    public void positionChanged(Animal a, Vector2d oldPosition)
-    {
+    public void positionChanged(Animal a, Vector2d oldPosition) {
         animals.get(oldPosition).remove(a);
-        if(!isInMap(a.getPosition()))
-            outOfMap(oldPosition,a);
+        if (!isInMap(a.getPosition()))
+            outOfMap(oldPosition, a);
         if (!animals.containsKey(a.getPosition()))
             animals.put(a.getPosition(), new ArrayList<>());
         animals.get(a.getPosition()).add(a);
     }
 
-    public Vector2d randomPosition()
-    {
+    public Vector2d randomPosition() {
         return new Vector2d(rand.nextInt(getUpperRight().x + 1), rand.nextInt(getUpperRight().y + 1));
     }
 
     public Plant plantAt(Vector2d position) {
         return plants.get(position);
     }
-    public boolean isPlantAt(Vector2d position){
+
+    public boolean isPlantAt(Vector2d position) {
         return plantAt(position) != null;
     }
+
     public ArrayList<Animal> animalsAt(Vector2d position) {
         return animals.get(position);
     }
+
     public boolean isAnimalAt(Vector2d position) {
         return animalsAt(position) != null && animalsAt(position).size() > 0;
     }
@@ -221,8 +215,8 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
     }
 
     protected abstract void outOfMap(Vector2d oldPos, Animal a);
-    public void died(Animal a)
-    {
+
+    public void died(Animal a) {
         if (config.plantGrowingType == SimulationTypes.PlantGrowingType.TOXICDEAD) {
             plantPreferredFields.get(plantPreferred[a.getPosition().y][a.getPosition().x]).remove(a.getPosition());
             plantPreferred[a.getPosition().y][a.getPosition().x]++;
@@ -232,9 +226,9 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver, IDeat
         }
         animals.get(a.getPosition()).remove(a);
     }
-    public void died(Plant p)
-    {
-        plants.put(p.getPosition(),null);
+
+    public void died(Plant p) {
+        plants.put(p.getPosition(), null);
         plantPreferredFields.get(plantPreferred[p.getPosition().y][p.getPosition().x]).add(p.getPosition());
     }
 }

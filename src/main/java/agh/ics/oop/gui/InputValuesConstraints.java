@@ -16,12 +16,13 @@ public class InputValuesConstraints {
     public final NumberConstraint maxAnimalMutationsNumberInputConstraint;
     public final NumberConstraint animalGenesLengthConstraint;
     public final NumberConstraint moveDelayConstraint;
-    public InputValuesConstraints(NumberConstraint mapHeightInputConstraint,NumberConstraint mapWidthInputConstraint,
-                                  NumberConstraint plantNumberInputConstraint,NumberConstraint plantEnergyInputConstraint,
-                                  NumberConstraint plantGrowingNumberInputConstraint,NumberConstraint startAnimalNumberInputConstraint,
-                                  NumberConstraint startAnimalEnergyInputConstraint,NumberConstraint fedAnimalEnergyInputConstraint,
-                                  NumberConstraint breedingEnergyUsedAnimalInputConstraint,NumberConstraint minAnimalMutationsNumberInputConstraint,
-                                  NumberConstraint maxAnimalMutationsNumberInputConstraint,NumberConstraint animalGenesLengthConstraint, NumberConstraint moveDelayConstraint) {
+
+    public InputValuesConstraints(NumberConstraint mapHeightInputConstraint, NumberConstraint mapWidthInputConstraint,
+                                  NumberConstraint plantNumberInputConstraint, NumberConstraint plantEnergyInputConstraint,
+                                  NumberConstraint plantGrowingNumberInputConstraint, NumberConstraint startAnimalNumberInputConstraint,
+                                  NumberConstraint startAnimalEnergyInputConstraint, NumberConstraint fedAnimalEnergyInputConstraint,
+                                  NumberConstraint breedingEnergyUsedAnimalInputConstraint, NumberConstraint minAnimalMutationsNumberInputConstraint,
+                                  NumberConstraint maxAnimalMutationsNumberInputConstraint, NumberConstraint animalGenesLengthConstraint, NumberConstraint moveDelayConstraint) {
         this.mapHeightInputConstraint = mapHeightInputConstraint;
         this.mapWidthInputConstraint = mapWidthInputConstraint;
         this.plantNumberInputConstraint = plantNumberInputConstraint;

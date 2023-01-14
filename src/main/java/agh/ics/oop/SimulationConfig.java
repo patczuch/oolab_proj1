@@ -22,10 +22,10 @@ public class SimulationConfig {
     public final AnimalBehaviourType animalBehaviourType;
     public final int moveDelay;
     public final String name;
+
     public SimulationConfig(String name, int mapHeight, int mapWidth, MapType mapType, int plantNumber, int plantEnergy, int plantGrowingNumber, PlantGrowingType plantGrowingType,
-                             int startAnimalNumber, int startAnimalEnergy, int fedAnimalEnergy, int breedingEnergyUsedAnimal, int minAnimalMutationsNumber,
-                             int maxAnimalMutationsNumber, AnimalMutationType animalMutationType, int animalGenesLength, AnimalBehaviourType animalBehaviourType, int moveDelay)
-    {
+                            int startAnimalNumber, int startAnimalEnergy, int fedAnimalEnergy, int breedingEnergyUsedAnimal, int minAnimalMutationsNumber,
+                            int maxAnimalMutationsNumber, AnimalMutationType animalMutationType, int animalGenesLength, AnimalBehaviourType animalBehaviourType, int moveDelay) {
         this.name = name;
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
@@ -46,30 +46,28 @@ public class SimulationConfig {
         this.moveDelay = moveDelay;
     }
 
-    public SimulationConfig(String name, JSONObject jsonObject)
-    {
+    public SimulationConfig(String name, JSONObject jsonObject) {
         this.name = name;
-        this.mapHeight = (int) (long) jsonObject.get("mapHeight");
+        this.mapHeight = (int) (long) jsonObject.get("mapHeight");  // to int czy long?
         this.mapWidth = (int) (long) jsonObject.get("mapWidth");
-        this.mapType = MapType.values()[(int) (long)jsonObject.get("mapType")];
+        this.mapType = MapType.values()[(int) (long) jsonObject.get("mapType")];
         this.plantNumber = (int) (long) jsonObject.get("plantNumber");
         this.plantEnergy = (int) (long) jsonObject.get("plantEnergy");
         this.plantGrowingNumber = (int) (long) jsonObject.get("plantGrowingNumber");
-        this.plantGrowingType = PlantGrowingType.values()[(int) (long)jsonObject.get("plantGrowingType")];
+        this.plantGrowingType = PlantGrowingType.values()[(int) (long) jsonObject.get("plantGrowingType")];
         this.startAnimalNumber = (int) (long) jsonObject.get("startAnimalNumber");
         this.startAnimalEnergy = (int) (long) jsonObject.get("startAnimalEnergy");
         this.fedAnimalEnergy = (int) (long) jsonObject.get("fedAnimalEnergy");
         this.breedingEnergyUsedAnimal = (int) (long) jsonObject.get("breedingEnergyUsedAnimal");
         this.minAnimalMutationsNumber = (int) (long) jsonObject.get("minAnimalMutationsNumber");
         this.maxAnimalMutationsNumber = (int) (long) jsonObject.get("maxAnimalMutationsNumber");
-        this.animalMutationType = AnimalMutationType.values()[(int) (long)jsonObject.get("animalMutationType")];
+        this.animalMutationType = AnimalMutationType.values()[(int) (long) jsonObject.get("animalMutationType")];
         this.animalGenesLength = (int) (long) jsonObject.get("animalGenesLength");
-        this.animalBehaviourType = AnimalBehaviourType.values()[(int) (long)jsonObject.get("animalBehaviourType")];
+        this.animalBehaviourType = AnimalBehaviourType.values()[(int) (long) jsonObject.get("animalBehaviourType")];
         this.moveDelay = (int) (long) jsonObject.get("moveDelay");
     }
 
-    public JSONObject toJsonObject()
-    {
+    public JSONObject toJsonObject() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("mapHeight", mapHeight);
         jsonObject.put("mapWidth", mapWidth);
@@ -91,8 +89,7 @@ public class SimulationConfig {
         return jsonObject;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return name;
     }
 }

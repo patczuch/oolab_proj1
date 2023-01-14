@@ -30,24 +30,25 @@ public class App extends Application {
     private ImageDictionary imageDictionary;
     private ObservableList<SimulationConfig> configs;
     private ComboBox<SimulationConfig> configsInput;
+
     @Override
     public void start(Stage primaryStage) {
         imageDictionary = new ImageDictionary();
 
         InputValuesConstraints inputValuesConstraints = new InputValuesConstraints(
-                new NumberConstraint(0,100),
-                new NumberConstraint(0,100),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(0,Integer.MAX_VALUE),
-                new NumberConstraint(1,Integer.MAX_VALUE),
-                new NumberConstraint(1,Integer.MAX_VALUE));
+                new NumberConstraint(0, 100),
+                new NumberConstraint(0, 100),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(0, Integer.MAX_VALUE),
+                new NumberConstraint(1, Integer.MAX_VALUE),
+                new NumberConstraint(1, Integer.MAX_VALUE));
 
         this.configs = FXCollections.observableArrayList(new ArrayList<>());
         configsInput = new ComboBox<>(configs);
@@ -56,20 +57,20 @@ public class App extends Application {
 
         Button saveConfigButton = new Button("Zapisz jako");
         HBox saveConfigButtonHbox = new HBox(saveConfigButton);
-        saveConfigButtonHbox.setPadding(new Insets(0,0,0,20));
+        saveConfigButtonHbox.setPadding(new Insets(0, 0, 0, 20));
 
         Button startButton = new Button("Start");
         VBox startButtonVBox = new VBox(startButton);
-        startButtonVBox.setPadding(new Insets(0,20,0,20));
+        startButtonVBox.setPadding(new Insets(0, 20, 0, 20));
 
         SimulationConfig currConfig = configsInput.getValue();
         if (currConfig == null)
-            currConfig = new SimulationConfig("domyślny",25,25, SimulationTypes.MapType.EARTH,30,
-                    10, 2, SimulationTypes.PlantGrowingType.FORESTYEQUATORS,10,10,
-                    10,5, 5,10,
-                    SimulationTypes.AnimalMutationType.FULLYRANDOM,20, SimulationTypes.AnimalBehaviourType.FULLYDETERMINED, 250);
+            currConfig = new SimulationConfig("domyślny", 25, 25, SimulationTypes.MapType.EARTH, 30,
+                    10, 2, SimulationTypes.PlantGrowingType.FORESTYEQUATORS, 10, 10,
+                    10, 5, 5, 10,
+                    SimulationTypes.AnimalMutationType.FULLYRANDOM, 20, SimulationTypes.AnimalBehaviourType.FULLYDETERMINED, 250);
 
-        SimulationConfigInput simulationConfigInput = new SimulationConfigInput(currConfig,inputValuesConstraints);
+        SimulationConfigInput simulationConfigInput = new SimulationConfigInput(currConfig, inputValuesConstraints);
         configsInput.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null)
                 simulationConfigInput.setValues(newValue);
@@ -94,17 +95,17 @@ public class App extends Application {
             updateConfigs();
         });
 
-        HBox configsHBox = new HBox(configsInput,saveConfigButtonHbox);
-        configsHBox.setPadding(new Insets(20,20,0,20));
+        HBox configsHBox = new HBox(configsInput, saveConfigButtonHbox);
+        configsHBox.setPadding(new Insets(20, 20, 0, 20));
 
         CheckBox saveStats = new CheckBox("Zapisuj statystyki do pliku .csv");
-        saveStats.setPadding(new Insets(0,20,10,20));
+        saveStats.setPadding(new Insets(0, 20, 10, 20));
 
 //        Scene scene = new Scene(new VBox(configsHBox,simulationConfigInput,new HBox(new Label("Seed:"),seedInput,new Label("Losowy:"),randomSeed),startButtonVBox),800,800);
         Scene scene = new Scene(new VBox(
                 configsHBox, simulationConfigInput,
                 new HBox(saveStats),
-                startButtonVBox), 800,800);
+                startButtonVBox), 800, 800);
 
         startButton.setOnAction(e -> {
             if (simulationConfigInput.getSimulationConfig().minAnimalMutationsNumber > simulationConfigInput.getSimulationConfig().maxAnimalMutationsNumber) {
@@ -146,7 +147,7 @@ public class App extends Application {
             files.forEach(f -> {
                 try (Reader reader = new FileReader(f, StandardCharsets.UTF_8)) {
                     JSONObject jsonObject = (JSONObject) parser.parse(reader);
-                    configs.add(new SimulationConfig(new File(f).getName().replace(".json",""), jsonObject));
+                    configs.add(new SimulationConfig(new File(f).getName().replace(".json", ""), jsonObject));
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ParseException e) {

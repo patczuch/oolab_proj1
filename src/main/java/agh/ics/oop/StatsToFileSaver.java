@@ -8,7 +8,7 @@ public class StatsToFileSaver {
     private final String filename;
     private final SimulationEngine engine;
 
-    static String width2(int number) {
+    static String width2(int number) {  // nieczytelna nazwa
         return String.format("%02d", number);
     }
 
@@ -36,13 +36,13 @@ public class StatsToFileSaver {
     void appendStats() throws IOException {
         writeToFile(
                 "" + engine.getCurrentDay() + ',' +
-                engine.getLivingAnimalNumber() + ',' +
-                engine.getPlantNumber() + ',' +
-                engine.map.countFreeFields() + ',' +
-                engine.getMostPopularGenes() + ',' +
-                engine.averageEnergyLevel.getAverage() + ',' +
-                engine.averageLifeSpan.getAverage() + ',' +
-                engine.getAllAnimalNumber()
+                        engine.getLivingAnimalNumber() + ',' +
+                        engine.getPlantNumber() + ',' +
+                        engine.map.countFreeFields() + ',' +
+                        engine.getMostPopularGenes() + ',' +
+                        engine.averageEnergyLevel.getAverage() + ',' +
+                        engine.averageLifeSpan.getAverage() + ',' +
+                        engine.getAllAnimalNumber()
         );
     }
 }

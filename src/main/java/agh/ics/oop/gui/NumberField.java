@@ -2,22 +2,25 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.NumberConstraint;
 import javafx.scene.control.TextField;
+
 import java.math.BigInteger;
 
 public class NumberField extends TextField {
 
     public final int defaultValue;
-    public NumberField()
-    {
+
+    public NumberField() {
         this(0);
     }
-    public NumberField(int startingValue)
-    {
-        this(startingValue,new NumberConstraint(Integer.MIN_VALUE,Integer.MAX_VALUE));
+
+    public NumberField(int startingValue) {
+        this(startingValue, new NumberConstraint(Integer.MIN_VALUE, Integer.MAX_VALUE));
     }
+
     public NumberField(NumberConstraint constraint) {
-        this(constraint.min,constraint);
+        this(constraint.min, constraint);
     }
+
     public NumberField(int startingValue, NumberConstraint constraint) {
         super(Integer.toString(startingValue));
         if (startingValue < constraint.min || startingValue > constraint.max)
@@ -27,7 +30,7 @@ public class NumberField extends TextField {
             if (!newValue.matches("^-?\\d*$"))
                 setText(newValue.replaceAll("[^-\\d]", ""));
             if (newValue.length() > 0 && newValue.charAt(0) == '-')
-                setText('-'+newValue.replaceAll("[^\\d]", ""));
+                setText('-' + newValue.replaceAll("[^\\d]", ""));
             if (getText().length() > 0 && !getText().equals("-"))
                 if (new BigInteger(getText()).compareTo(new BigInteger(Integer.toString(Integer.MAX_VALUE))) > 0)
                     setText(Integer.toString(Integer.MAX_VALUE));
@@ -39,15 +42,14 @@ public class NumberField extends TextField {
                 setText(Integer.toString(constraint.max));
         });
     }
-    public int getValue()
-    {
+
+    public int getValue() {
         if (getText().equals("") || getText().equals("-"))
             return defaultValue;
         return Integer.parseInt(getText());
     }
 
-    public void setNumber(int n)
-    {
+    public void setNumber(int n) {
         setText(String.valueOf(n));
     }
 }

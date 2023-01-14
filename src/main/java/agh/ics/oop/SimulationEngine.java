@@ -8,34 +8,32 @@ import java.util.*;
 
 import java.lang.Thread;
 
-public class SimulationEngine implements Runnable, IPositionChangeObserver, IDeathObserver{
+public class SimulationEngine implements Runnable, IPositionChangeObserver, IDeathObserver {
     public final AbstractWorldMap map;
     // Only alive animals are stored
     private final ArrayList<Animal> animals;
     private final ArrayList<Plant> plants;
     private final SimulationConfig config;
     private final SimulationStage stage;
-    private boolean stop = false;
+    private boolean stop = false;   // stopped
     private boolean paused = false;
-    private final ArrayList<Vector2d> toUpdate;
+    private final ArrayList<Vector2d> toUpdate; // a nie Set?
     private int currentDay = 0;
     private int totalAnimalCounter = 0; // Including the dead ones
     private final HashMap<MoveDirection, Integer> genesPopularity = new HashMap<>();
     private ArrayList<GeneHolder> mostPopularGenes;
-    public AverageCalculator averageLifeSpan = new AverageCalculator();
-    public AverageCalculator averageEnergyLevel = new AverageCalculator();
+    public AverageCalculator averageLifeSpan = new AverageCalculator();  // public?
+    public AverageCalculator averageEnergyLevel = new AverageCalculator();  // public?
     private StatsToFileSaver statsSaver;
     private Random rand;
 
-    public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage, boolean saveStats)
-    {
+    public SimulationEngine(SimulationConfig config, Random rand, SimulationStage stage, boolean saveStats) {
         toUpdate = new ArrayList<>();
         this.config = config;
-        switch(config.mapType)
-        {
+        switch (config.mapType) {
 //            case EARTH -> this.map = new Earth(config,rand);
-            case HELLPORTAL -> this.map = new HellPortal(config,rand);
-            default -> this.map = new Earth(config,rand);
+            case HELLPORTAL -> this.map = new HellPortal(config, rand);
+            default -> this.map = new Earth(config, rand);
         }
         this.stage = stage;
         this.rand = rand;
@@ -51,7 +49,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
         }
 
         plants = new ArrayList<>();
-        for (int i = 0; i < config.plantNumber; i++){
+        for (int i = 0; i < config.plantNumber; i++) {
             Plant p = map.spawnRandomPlant();
             if (p != null) {
                 plants.add(p);
@@ -71,23 +69,21 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
 
     @Override
     public void run() {
-        while (true) {
-            if (stop)
-                return;
+        while (!stop) {
             currentDay++;
 
             Platform.runLater(() -> {
                 ArrayList<Vector2d> updated = new ArrayList<>();
-                for (int i = 0; i<toUpdate.size(); i++) {
+                for (int i = 0; i < toUpdate.size(); i++) {
                     Vector2d v = toUpdate.get(i);
                     stage.update(v);
                     updated.add(v);
                 }
-                toUpdate.removeAll(updated);
+                toUpdate.removeAll(updated);    // clear() ?
                 stage.updateBackground();
             });
 
-            for (int i = 0; i<animals.size(); i++)
+            for (int i = 0; i < animals.size(); i++)
                 if (animals.get(i).getEnergy() <= 0) {
                     animals.get(i).die();
                     i--;
@@ -109,8 +105,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
             });
 
             averageEnergyLevel.clear();
-            for (Animal a : animals)
-            {
+            for (Animal a : animals) {
                 if (map.isPlantAt(a.getPosition())) {
                     set.clear();
                     set.addAll(map.animalsAt(a.getPosition()));
@@ -121,7 +116,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                 averageEnergyLevel.add(a.getEnergy());
             }
 
-            for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++){
+            for (int y = 0; y <= map.getUpperRight().subtract(map.getLowerLeft()).y; y++) {
                 for (int x = 0; x <= map.getUpperRight().subtract(map.getLowerLeft()).x; x++) {
                     Vector2d v = new Vector2d(x, y);
                     if (map.animalsAt(v) != null) {
@@ -132,13 +127,13 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
                     if (set.size() >= 2) {
                         Animal a = set.first();
                         set.remove(a);
-                        Animal child = map.spawnBredAnimal(a,set.first());
+                        Animal child = map.spawnBredAnimal(a, set.first());
                         placeAnimal(child);
                     }
                 }
             }
 
-            for(int i = 0; i < config.plantGrowingNumber; i++) {
+            for (int i = 0; i < config.plantGrowingNumber; i++) {
                 Plant p = map.spawnRandomPlant();
                 if (p != null) {
                     plants.add(p);
@@ -157,7 +152,7 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
             }
 
             try {
-                while (paused)
+                while (paused) // to nie jest dobry sposób pauzowania
                     Thread.sleep(200);
                 Thread.sleep(config.moveDelay);
             } catch (InterruptedException e) {
@@ -206,9 +201,11 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
     public int getLivingAnimalNumber() {
         return animals.size();
     }
+
     public int getAllAnimalNumber() {
         return totalAnimalCounter;
     }
+
     public int getPlantNumber() {
         return plants.size();
     }
@@ -236,9 +233,11 @@ public class SimulationEngine implements Runnable, IPositionChangeObserver, IDea
 
         return result.toString().trim();
     }
+
     public String getMostPopularGenes(int howMany) {
         return getMostPopularGenes(howMany, false);
     }
+
     public String getMostPopularGenes() {
         return getMostPopularGenes(MoveDirection.values().length, false);
     }

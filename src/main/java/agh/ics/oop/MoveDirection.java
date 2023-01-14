@@ -13,35 +13,32 @@ public enum MoveDirection {
     FORWARDLEFT(7);
 
     public final int numberOfTurns;
+
     MoveDirection(int numberOfTurns) {
         this.numberOfTurns = numberOfTurns;
     }
 
-    public static MoveDirection[] randomMoves(Random rand, int l)
-    {
+    public static MoveDirection[] randomMoves(Random rand, int l) {
         MoveDirection[] genes = new MoveDirection[l];
-        for (int i = 0; i<l; i++)
+        for (int i = 0; i < l; i++)
             genes[i] = MoveDirection.values()[rand.nextInt(MoveDirection.values().length)];
         return genes;
     }
 
-    public static MoveDirection random(Random rand)
-    {
+    public static MoveDirection random(Random rand) {
         return MoveDirection.values()[rand.nextInt(MoveDirection.values().length)];
     }
 
-    public MoveDirection next()
-    {
-        if (this.ordinal()+1 >= MoveDirection.values().length)
+    public MoveDirection next() {
+        if (this.ordinal() + 1 >= MoveDirection.values().length)
             return MoveDirection.values()[0];
-        return MoveDirection.values()[this.ordinal()+1];
+        return MoveDirection.values()[this.ordinal() + 1];
     }
 
-    public MoveDirection previous()
-    {
-        if (this.ordinal()-1 < 0)
-            return MoveDirection.values()[MoveDirection.values().length-1];
-        return MoveDirection.values()[this.ordinal()-1];
+    public MoveDirection previous() {
+        if (this.ordinal() - 1 < 0)
+            return MoveDirection.values()[MoveDirection.values().length - 1];
+        return MoveDirection.values()[this.ordinal() - 1];
     }
 
     public char humanReadable() {
